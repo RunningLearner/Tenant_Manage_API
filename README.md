@@ -53,3 +53,11 @@ C#을 처음 접하는 신입사원들이 기업솔루션사업부의 기존 제
 - [Microsoft Graph를 사용하여 파일 액세스](https://learn.microsoft.com/ko-kr/training/modules/msgraph-access-file-data/)
 - [Microsoft Graph에서 확장을 사용하여 앱에 사용자 지정 데이터 추가](https://learn.microsoft.com/ko-kr/training/modules/msgraph-extensions/)
 - [Microsoft Graph에서 알림 변경 및 변경 내용 추적 사용](https://learn.microsoft.com/ko-kr/training/modules/msgraph-changenotifications-trackchanges/)
+
+### Git을 통한 코드 형상관리 자율학습 자료
+
+- [Microsoft Learn의 Git를 사용한 버전 제어 학습 경로](https://learn.microsoft.com/ko-kr/training/paths/intro-to-vc-git/)
+- [Github에서 제공하는 GitHub Skills 인터랙티브 코스](https://skills.github.com/)
+- [누구나 쉽게 이해할 수 있는 Git 입문](https://backlog.com/git-tutorial/kr/)
+- [인터랙티브하게 Git 브랜치 배우기](https://learngitbranching.js.org/?locale=ko)
+- [Pro Git 전자책](https://git-scm.com/book/ko/v2)
