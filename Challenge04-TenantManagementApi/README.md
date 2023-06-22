@@ -1,56 +1,45 @@
-# 4번째 과제: `directclouddev` 테넌트 관리 API 만들기
+# 5번째 과제: `directclouddev` 테넌트 관리 API 기능 추가하기
 
-`directclouddev` 테넌트에 존재하는 사용자 및 그룹 정보를 CRUD할 수 있는 API를 제작해야 한다.
+지난번에 만든 `TenantManagementApi` 제품에 새로운 기능을 추가해야 한다.
 
 ## 과제 수행 절차
 
-1. 이 Git 저장소를 자기 PC로 Clone하여, `[사내ID]-04` 브랜치로 Checkout한다.
+1. 이 Git 저장소를 자기 PC로 Clone하여, `sinam-05` 브랜치로 Checkout한다.
 2. 해당 브랜치에서 기능 요구사항과 비기능적 요구사항을 모두 충족하는 앱을 작성한다.
 3. 모든 요구사항을 해결했으면, `README.md` 등 문서를 작성한다.
 4. 작성한 모든 내용을 서버에 Push한다.
-5. `[사내ID]-04-result` 이름으로 된 브랜치를 대상으로 Pull Request를 작성한다.
+5. `sinam-05-result` 이름으로 된 브랜치를 대상으로 Pull Request를 작성한다.
 6. Pull Request를 통해 강사의 코드 리뷰를 받고 피드백에 따라 수정한다.
 7. 리뷰어가 PR을 승인하여 Pull Request가 통과되면 과제 완료.
 
 ## 기능 요구사항
 
-- `directclouddev` 테넌트에 대해 앱 권한으로 다음 동작을 각각 수행할 수 있는 웹 API를 만들어야 한다.
-  - 특정 사용자 계정 정보 읽기
-  - 사용자 계정 추가
-  - 사용자 계정 정보 변경
-  - 사용자 계정 삭제
-  - 특정 그룹 정보 읽기
-  - 그룹 추가
-  - 그룹 정보 변경
-  - 그룹 삭제
-- 클라이언트에 정보를 제공할 때 Graph SDK에서 제공하는 `User` 및 `Group` 클래스를 그대로 쓰지 말고, 필요한 일부 정보만 추출 및 가공해서 주도록 한다.
-- 정보의 쓰기(변경) 동작을 할 때는 반드시 사용자 측 HTTP 요청 헤더 중 `X-API-KEY`에 미리 약속된 API Key 값이 포함되어 있어야 한다.
-  - API Key 값은 `appsettings.json` 파일에서 지정할 수 있어야 한다.
-  - API Key가 일치하지 않는 경우 `401 Unauthorized` 응답을 반환해야 한다.
-- 각 동작을 처리할 때는 모든 처리 내역을 로그에 남겨야 한다.
-  - 로그를 남기는 위치는 로그 파일 및 App Insights의 2군데여야 한다.
-  - 파일 로그는 최소 1달간 보존될 수 있어야 한다.
-  - 각 동작 로그에는 처리에 소요된 시간을 `Duration`이라는 필드에 초 단위로 남겨야 한다. 기록 정밀도는 0.001초로 한다.
-- App Insights에서 가용성을 체크할 수 있는 헬스체크 엔드포인트가 별도로 제공되어야 한다.
-- 개발 환경에서 Swagger를 제공하되, 다른 참조 문서가 필요하지 않도록 Swagger 내에서 최대한 올바른 문서화를 제공해야 한다.
+- 기존에 만들어진 `TenantManagementApi` 제품에 다음과 같은 기능을 추가해야 한다.
+  - 모든 사용자 계정 정보 불러오기
+  - 모든 그룹 정보 불러오기
+- 모든 사용자/그룹 정보를 제공할 때 페이징을 적용해야 한다.
+  - API 호출 1번에 제공되는 정보의 개수가 최대 50개를 넘으면 안 된다.
+  - API 호출 1번에 제공되는 정보의 기본 개수는 10개로 한다.
+  - 당연히 이를 초과하는 다음 번 페이지를 제공하는 링크 정보를 함께 제공해야 한다.
+- 클라이언트에서 우리 API를 호출할 때마다 Graph API 호출이 발생하면 안 된다.
+  - 필요한 정보를 불러오는 기능을 전담하는 별도의 백그라운드 서비스를 만든다.
+  - 백그라운드 서비스는 5분마다 Graph API로 정보를 불러와서 SQLite DB에 저장한다.
+  - 클라이언트에서 모든 사용자/그룹 정보를 요청할 경우, SQLite DB에 저장된 내용으로 서빙한다.
+- Graph API에서 `429 Too Many Requests` 코드를 반환했을 때, 이에 적절히 대응할 수 있어야 한다.
+  - Graph SDK에는 이미 관련 기능이 내장되어 있으므로, 이를 학습하고 옵션을 살펴본다.
 
 ## 비기능적 요구사항
 
-- 템플릿에 있던 샘플인 `WeatherForecast` 관련 내용은 모두 삭제해야 한다.
-- 기존 과제에서 유지했던 각종 컨벤션들을 준수해야 한다.
-- `directclouddev` 테넌트에 접근할 때는 Graph API를 사용해야 한다.
-  - 이를 위해 최신 버전의 Graph SDK를 사용해야 한다.
-- JSON 데이터를 직렬화/역직렬화할 때는 `Newtonsoft.Json` 패키지를 사용해야 한다.
-  - 각 필드에 적절한 애트리뷰트를 설정해야 한다.
-- 로그를 남길 때는 `Serilog` 및 관련 Sink 패키지를 사용해야 한다.
-- DI 컨테이너를 통해 의존성 주입 원칙을 실현한다.
+- 기존 과제에서 유지했던 각종 컨벤션과 원칙들을 준수해야 한다.
 - API는 최대한 RESTful하게 만든다.
-- 테스트를 위해 특정 사용자 계정이나 그룹의 정보를 변경 또는 삭제할 때는 기존에 존재하는 데이터를 건드리는 일이 없도록 주의한다.
-  - 테스트를 위해 직접 만든 계정 및 그룹은 별도로 기록해 뒀다가 추후 정리할 수 있도록 한다.
-- 필요한 앱 권한 설정 등은 직접 수행한다.
-  - 편의상 기존 앱 등록을 재활용해도 좋다.
+- 지난 과제에서는 시간상의 이유로 적용하지 못했던 `README.md` 작성을 이번에는 하도록 한다.
 
 ## 힌트
 
-- 모든 것을 따라할 수는 없지만, 일부 내용은 현대백화점 프로젝트 쪽에서 참고할 만한 코드를 찾아볼 수 있다.
-- 중간에 프론트엔드 수업을 하다 보니 그 전에 배웠던 각종 객체지향 원칙을 살짝 잊은 듯한 느낌이 드는데, 이 부분에 대해서도 신경써 보자.
+- RESTful 웹 API 디자인과 관련하여 MS에서 제공하는 각종 자료를 참고한다.
+  - [모범 사례: RESTful 웹 API 디자인](https://learn.microsoft.com/ko-kr/azure/architecture/best-practices/api-design)
+  - [모범 사례: 웹 API 구현](https://learn.microsoft.com/ko-kr/azure/architecture/best-practices/api-implementation)
+  - [Azure API Design eBook](https://azure.microsoft.com/mediahandler/files/resourcefiles/api-design/Azure_API-Design_Guide_eBook.pdf) (PDF)
+  - [Microsoft Azure REST API Guidelines](https://aka.ms/azapi/guidelines) (MS의 내부 API 설계 지침)
+- Graph API에서 `429 Too Many Requests` 응답을 반환하는 것을 로컬에서 시뮬레이션하려면 [Microsoft 365 Developer Proxy](https://github.com/microsoft/m365-developer-proxy)를 사용한다.
+- 시간이 남으면 최신 버전의 `Microsoft.AspNetCore.OData` 패키지를 통해 ASP.NET Core Web API에서 OData 규격을 준수하는 RESTful API를 구축하는 방법을 자습한다.
