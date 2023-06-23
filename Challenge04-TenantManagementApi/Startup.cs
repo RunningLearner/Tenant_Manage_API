@@ -5,6 +5,8 @@ using Challenge04_TenantManagementApi.Services;
 using Microsoft.OpenApi.Models;
 using Challenge04_TenantManagementApi.Filters;
 using Challenge04_TenantManagementApi.Middlewares;
+using Challenge04_TenantManagementApi.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace Challenge04_TenantManagementApi;
 
@@ -23,8 +25,8 @@ public class Startup
         services.AddHealthChecks()
             .AddCheck<HealthCheckService>("HealthCheckService"); ;
 
-        services.AddScoped<ValidateModelFilter>();
-        services.AddSingleton<ExceptionHandlingMiddleware>();
+        services.AddDbContext<GraphDbContext>(opt =>
+            opt.UseSqlite(_configuration.GetConnectionString("DefaultConnection")));
 
         services.AddMvc(x =>
         {
@@ -34,6 +36,8 @@ public class Startup
             x.SuppressModelStateInvalidFilter = true;
         });
 
+        services.AddScoped<ValidateModelFilter>();
+        services.AddSingleton<ExceptionHandlingMiddleware>();
         services.AddHttpContextAccessor();
         services.AddControllers();
         services.AddEndpointsApiExplorer();
