@@ -11,14 +11,13 @@ namespace Challenge04_TenantManagementApi.Services;
 public sealed class TimedDataFetchingService : BackgroundService
 {
     private readonly ILogger<TimedDataFetchingService> _logger;
+    private readonly IServiceScopeFactory _serviceScopeFactory;
     private readonly GraphServiceClient _graphClient;
-
-    private readonly GraphDbContext _dbContext;
-    public TimedDataFetchingService(ILogger<TimedDataFetchingService> logger, GraphServiceClient graphClient, GraphDbContext dbContext)
+    public TimedDataFetchingService(ILogger<TimedDataFetchingService> logger, IServiceScopeFactory serviceScopeFactory, GraphServiceClient graphClient)
     {
         _logger = logger;
+        _serviceScopeFactory = serviceScopeFactory;
         _graphClient = graphClient;
-        _dbContext = dbContext;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -29,8 +28,15 @@ public sealed class TimedDataFetchingService : BackgroundService
         {
             _logger.LogInformation("Timed Data Fetching Service is working.");
 
-            await FetchUserData();
-            await FetchGroupData();
+            using (var scope = _serviceScopeFactory.CreateScope())
+            {
+                var dbContext = scope.ServiceProvider.GetRequiredService<GraphDbContext>();
+
+                // Use dbContext to interact with the database here
+                await FetchUserData(dbContext);
+                await FetchGroupData(dbContext);
+
+            }
 
             await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken);
         }
@@ -38,7 +44,7 @@ public sealed class TimedDataFetchingService : BackgroundService
         _logger.LogInformation("Timed Data Fetching Service is stopping.");
     }
 
-    private async Task FetchUserData()
+    private async Task FetchUserData(GraphDbContext dbContext)
     {
         var usersResponse = await _graphClient.Users.GetAsync(requestConfiguration =>
          {
@@ -48,11 +54,11 @@ public sealed class TimedDataFetchingService : BackgroundService
         var pageIterator = PageIterator<GraphUser, UserCollectionResponse>
                     .CreatePageIterator(_graphClient, usersResponse, async (user) =>
                     {
-                        var dbUser = await _dbContext.Users.FindAsync(user.Id);
+                        var dbUser = await dbContext.Users.FindAsync(user.Id);
 
                         if (dbUser == null)
                         {
-                            _dbContext.Users.Add(new DbUser
+                            var res = dbContext.Users.Add(new DbUser
                             {
                                 Id = user.Id!,
                                 DisplayName = user.DisplayName,
@@ -62,13 +68,10 @@ public sealed class TimedDataFetchingService : BackgroundService
                         }
                         else
                         {
-                            _dbContext.Users.Update(new DbUser
-                            {
-                                Id = user.Id!,
-                                DisplayName = user.DisplayName,
-                                UserPrincipalName = user.UserPrincipalName,
-                                MailNickname = user.MailNickname
-                            });
+                            dbUser.DisplayName = user.DisplayName;
+                            dbUser.UserPrincipalName = user.UserPrincipalName;
+                            dbUser.MailNickname = user.MailNickname;
+                            dbContext.Users.Update(dbUser);
                         }
 
                         return true;
@@ -77,7 +80,7 @@ public sealed class TimedDataFetchingService : BackgroundService
         await pageIterator.IterateAsync();
     }
 
-    private async Task FetchGroupData()
+    private async Task FetchGroupData(GraphDbContext dbContext)
     {
         var groupsResponse = await _graphClient.Groups.GetAsync(requestConfiguration =>
          {
@@ -87,11 +90,11 @@ public sealed class TimedDataFetchingService : BackgroundService
         var pageIterator = PageIterator<GraphGroup, GroupCollectionResponse>
                     .CreatePageIterator(_graphClient, groupsResponse, async (group) =>
                     {
-                        var dbGroup = await _dbContext.Groups.FindAsync(group.Id);
+                        var dbGroup = await dbContext.Groups.FindAsync(group.Id);
 
                         if (dbGroup == null)
                         {
-                            _dbContext.Groups.Add(new DbGroup
+                            dbContext.Groups.Add(new DbGroup
                             {
                                 Id = group.Id!,
                                 DisplayName = group.DisplayName,
@@ -101,15 +104,13 @@ public sealed class TimedDataFetchingService : BackgroundService
                         }
                         else
                         {
-                            _dbContext.Groups.Update(new DbGroup
-                            {
-                                Id = group.Id!,
-                                DisplayName = group.DisplayName,
-                                Description = group.Description,
-                                MailNickname = group.MailNickname
-                            });
+                            dbGroup.DisplayName = group.DisplayName;
+                            dbGroup.Description = group.Description;
+                            dbGroup.MailNickname = group.MailNickname;
+                            dbContext.Groups.Update(dbGroup);
                         }
 
+                        await dbContext.SaveChangesAsync();
                         return true;
                     });
 

@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Challenge04_TenantManagementApi.Services;
 using Challenge04_TenantManagementApi.Models;
-using Microsoft.Graph.Models.ODataErrors;
 using Challenge04_TenantManagementApi.Attributes;
 using System.ComponentModel.DataAnnotations;
+using System.Web;
 
 namespace Challenge04_TenantManagementApi.Controllers;
 
@@ -13,11 +13,42 @@ public sealed class UserController : ControllerBase
 {
     private readonly UserService _service;
     private readonly ILogger<UserController> _logger;
+    private readonly IUrlHelper _urlHelper;
 
-    public UserController(UserService service, ILogger<UserController> logger)
+    public UserController(UserService service, ILogger<UserController> logger, IUrlHelper urlHelper)
     {
         _service = service;
         _logger = logger;
+        _urlHelper = urlHelper;
+    }
+
+    // GET: api/User/5
+    [HttpGet(Name = "GetAllUsers")]
+    [ExecutionTime]
+    public async Task<ActionResult<PageResponse<User>>> GetAllUser([FromQuery] GetAllUserDto getAllUserDto)
+    {
+        string? cursor = null;
+
+        if (!string.IsNullOrEmpty(getAllUserDto.NextUrl))
+        {
+            var uri = new Uri(getAllUserDto.NextUrl);
+            var queryParameters = HttpUtility.ParseQueryString(uri.Query);
+            cursor = queryParameters.Get("cursor");
+        }
+
+        var (users, nextCursor) = await _service.GetAllAsync(getAllUserDto.PageSize, cursor);
+        var response = new PageResponse<User>
+        {
+            Data = users
+        };
+
+        if (nextCursor != null)
+        {
+            var urlParams = new { getAllUserDto.PageSize, cursor = nextCursor };
+            response.NextUrl = _urlHelper.Link("GetAllUsers", urlParams);
+        }
+
+        return Ok(response);
     }
 
     // GET: api/User/5

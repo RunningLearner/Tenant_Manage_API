@@ -7,6 +7,9 @@ using Challenge04_TenantManagementApi.Filters;
 using Challenge04_TenantManagementApi.Middlewares;
 using Challenge04_TenantManagementApi.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.Mvc.Routing;
 
 namespace Challenge04_TenantManagementApi;
 
@@ -34,6 +37,15 @@ public class Startup
         }).ConfigureApiBehaviorOptions(x =>
         {
             x.SuppressModelStateInvalidFilter = true;
+        });
+
+        services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
+
+        services.AddScoped<IUrlHelper>(x =>
+        {
+            var actionContext = x.GetRequiredService<IActionContextAccessor>().ActionContext;
+            var factory = x.GetRequiredService<IUrlHelperFactory>();
+            return factory.GetUrlHelper(actionContext);
         });
 
         services.AddScoped<ValidateModelFilter>();
