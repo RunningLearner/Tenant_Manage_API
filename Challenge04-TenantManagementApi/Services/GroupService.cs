@@ -1,6 +1,6 @@
 using Challenge04_TenantManagementApi.Models;
 using Microsoft.Graph;
-using Microsoft.Graph.Models;
+using Group = Microsoft.Graph.Models.Group;
 
 namespace Challenge04_TenantManagementApi.Services;
 

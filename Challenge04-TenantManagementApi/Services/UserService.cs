@@ -1,6 +1,7 @@
 using Challenge04_TenantManagementApi.Models;
 using Microsoft.Graph;
 using Microsoft.Graph.Models;
+using User = Microsoft.Graph.Models.User;
 
 namespace Challenge04_TenantManagementApi.Services;
 
