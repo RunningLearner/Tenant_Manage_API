@@ -37,6 +37,10 @@ public class ExceptionHandlingMiddleware : IMiddleware
                 response.StatusCode = ex.ResponseStatusCode;
                 errorResponse = ex.Message;
                 break;
+            case KeyNotFoundException ex:
+                response.StatusCode = (int)HttpStatusCode.NotFound;
+                errorResponse = ex.Message;
+                break;
             default:
                 _logger.LogError(exception, "서버 에러 발생");
                 response.StatusCode = (int)HttpStatusCode.InternalServerError;

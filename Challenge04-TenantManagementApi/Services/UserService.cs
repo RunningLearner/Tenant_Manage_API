@@ -33,6 +33,7 @@ public sealed class UserService
         var users = await query.OrderBy(user => user.Id).Take(pageSize + 1).ToListAsync();
 
         string? nextCursor = null;
+
         if (users.Count > pageSize)
         {
             nextCursor = users.Last().Id;
@@ -44,10 +45,16 @@ public sealed class UserService
 
     public async Task<UserDto> GetAsync(string id)
     {
-        var user = await _graphClient.Users[id].GetAsync();
-        _logger.LogInformation("UserId : {Id}", user?.Id);
+        var user = await _graphDbContext.Users.FindAsync(id);
 
-        return ItemToDto(user!);
+        if (user is null)
+        {
+            throw new KeyNotFoundException($"ID '{id}'를 가진 유저를 찾지 못했습니다.");
+        }
+
+        _logger.LogInformation("UserId : {Id}", user.Id);
+
+        return ItemToDto(user);
     }
 
     public async Task<UserDto> AddAsync(CreateUserDto createUserDto)
@@ -92,6 +99,17 @@ public sealed class UserService
     }
 
     private static UserDto ItemToDto(GrpahUser user)
+    {
+        return new UserDto
+        {
+            Id = user.Id!,
+            DisplayName = user.DisplayName,
+            UserPrincipalName = user.UserPrincipalName,
+            MailNickname = user.MailNickname
+        };
+    }
+
+    private static UserDto ItemToDto(DbUser user)
     {
         return new UserDto
         {

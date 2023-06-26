@@ -32,6 +32,7 @@ public sealed class GroupService
         var groups = await query.OrderBy(group => group.Id).Take(pageSize + 1).ToListAsync();
 
         string? nextCursor = null;
+
         if (groups.Count > pageSize)
         {
             nextCursor = groups.Last().Id;
@@ -43,10 +44,16 @@ public sealed class GroupService
 
     public async Task<GroupDto> GetAsync(string id)
     {
-        var group = await _graphClient.Groups[id].GetAsync();
-        _logger.LogInformation("GroupId : {Id}", group?.Id);
+        var group = await _graphDbContext.Groups.FindAsync(id);
 
-        return ItemToDto(group!);
+        if (group is null)
+        {
+            throw new KeyNotFoundException($"ID '{id}'를 가진 그룹을 찾지 못했습니다.");
+        }
+
+        _logger.LogInformation("GroupId : {Id}", group.Id);
+
+        return ItemToDto(group);
     }
 
     public async Task<GroupDto> AddAsync(CreateGroupDto createGroupDto)
@@ -88,6 +95,17 @@ public sealed class GroupService
     }
 
     private static GroupDto ItemToDto(GraphGroup group)
+    {
+        return new GroupDto
+        {
+            Id = group.Id!,
+            DisplayName = group.DisplayName,
+            Description = group.Description,
+            MailNickname = group.MailNickname
+        };
+    }
+
+    private static GroupDto ItemToDto(DbGroup group)
     {
         return new GroupDto
         {
