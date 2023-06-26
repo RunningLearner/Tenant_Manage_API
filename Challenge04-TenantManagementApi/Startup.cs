@@ -7,7 +7,6 @@ using Challenge04_TenantManagementApi.Filters;
 using Challenge04_TenantManagementApi.Middlewares;
 using Challenge04_TenantManagementApi.Data;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Routing;
 
