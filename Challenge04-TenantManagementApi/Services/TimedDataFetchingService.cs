@@ -5,6 +5,7 @@ using DbUser = Challenge04_TenantManagementApi.Models.User;
 using GraphUser = Microsoft.Graph.Models.User;
 using DbGroup = Challenge04_TenantManagementApi.Models.Group;
 using GraphGroup = Microsoft.Graph.Models.Group;
+using Microsoft.Kiota.Http.HttpClientLibrary.Middleware.Options;
 
 namespace Challenge04_TenantManagementApi.Services;
 
@@ -13,6 +14,7 @@ public sealed class TimedDataFetchingService : BackgroundService
     private readonly ILogger<TimedDataFetchingService> _logger;
     private readonly IServiceScopeFactory _serviceScopeFactory;
     private readonly GraphServiceClient _graphClient;
+
     public TimedDataFetchingService(ILogger<TimedDataFetchingService> logger, IServiceScopeFactory serviceScopeFactory, GraphServiceClient graphClient)
     {
         _logger = logger;
@@ -46,9 +48,16 @@ public sealed class TimedDataFetchingService : BackgroundService
 
     private async Task FetchUserData(GraphDbContext dbContext)
     {
+        var retryHandlerOption = new RetryHandlerOption
+        {
+            MaxRetry = 7,
+            ShouldRetry = (delay, attempt, message) => true
+        };
+
         var usersResponse = await _graphClient.Users.GetAsync(requestConfiguration =>
          {
              requestConfiguration.QueryParameters.Select = new[] { "id", "displayName", "userPrincipalName", "mailNickname" };
+             requestConfiguration.Options.Add(retryHandlerOption);
          }) ?? throw new ArgumentNullException("usersResponse", "No users were found.");
 
         var pageIterator = PageIterator<GraphUser, UserCollectionResponse>
@@ -82,9 +91,16 @@ public sealed class TimedDataFetchingService : BackgroundService
 
     private async Task FetchGroupData(GraphDbContext dbContext)
     {
+        var retryHandlerOption = new RetryHandlerOption
+        {
+            MaxRetry = 7,
+            ShouldRetry = (delay, attempt, message) => true
+        };
+
         var groupsResponse = await _graphClient.Groups.GetAsync(requestConfiguration =>
          {
              requestConfiguration.QueryParameters.Select = new[] { "id", "displayName", "description", "mailNickname" };
+             requestConfiguration.Options.Add(retryHandlerOption);
          }) ?? throw new ArgumentNullException("groupsResponse", "No users were found.");
 
         var pageIterator = PageIterator<GraphGroup, GroupCollectionResponse>
