@@ -2,7 +2,6 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 
 namespace Challenge04_TenantManagementApi.Services;
 
-
 public class HealthCheckService : IHealthCheck
 {
     private const string ClassName = nameof(HealthCheckService);
