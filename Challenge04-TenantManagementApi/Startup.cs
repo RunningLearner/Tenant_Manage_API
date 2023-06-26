@@ -41,11 +41,11 @@ public class Startup
 
         services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
 
-        services.AddScoped<IUrlHelper>(x =>
+        services.AddScoped(x =>
         {
             var actionContext = x.GetRequiredService<IActionContextAccessor>().ActionContext;
             var factory = x.GetRequiredService<IUrlHelperFactory>();
-            return factory.GetUrlHelper(actionContext);
+            return factory.GetUrlHelper(actionContext!);
         });
 
         services.AddScoped<ValidateModelFilter>();
