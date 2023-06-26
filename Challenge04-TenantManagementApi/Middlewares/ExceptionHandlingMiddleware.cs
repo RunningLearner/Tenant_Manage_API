@@ -37,9 +37,14 @@ public class ExceptionHandlingMiddleware : IMiddleware
                 response.StatusCode = ex.ResponseStatusCode;
                 errorResponse = ex.Message;
                 break;
-            case KeyNotFoundException ex:
-                response.StatusCode = (int)HttpStatusCode.NotFound;
+            case ArgumentOutOfRangeException ex:
+                response.StatusCode = (int)HttpStatusCode.BadRequest;
                 errorResponse = ex.Message;
+                break;
+            case KeyNotFoundException:
+            case ArgumentNullException:
+                response.StatusCode = (int)HttpStatusCode.NotFound;
+                errorResponse = exception.Message;
                 break;
             default:
                 _logger.LogError(exception, "서버 에러 발생");
