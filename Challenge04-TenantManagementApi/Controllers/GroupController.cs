@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Challenge04_TenantManagementApi.Services;
 using Challenge04_TenantManagementApi.Models;
-using Microsoft.Graph.Models.ODataErrors;
 using Challenge04_TenantManagementApi.Attributes;
 using System.ComponentModel.DataAnnotations;
+using System.Web;
 
 namespace Challenge04_TenantManagementApi.Controllers;
 
@@ -13,11 +13,42 @@ public sealed class GroupController : ControllerBase
 {
     private readonly GroupService _service;
     private readonly ILogger<GroupController> _logger;
+    private readonly IUrlHelper _urlHelper;
 
-    public GroupController(GroupService service, ILogger<GroupController> logger)
+    public GroupController(GroupService service, ILogger<GroupController> logger, IUrlHelper urlHelper)
     {
         _service = service;
         _logger = logger;
+        _urlHelper = urlHelper;
+    }
+
+    // GET: api/User/5
+    [HttpGet(Name = "GetAllUsers")]
+    [ExecutionTime]
+    public async Task<ActionResult<PageResponse<Group>>> GetAllUser([FromQuery] GetAllDto getAllDto)
+    {
+        string? cursor = null;
+
+        if (!string.IsNullOrEmpty(getAllDto.NextUrl))
+        {
+            var uri = new Uri(getAllDto.NextUrl);
+            var queryParameters = HttpUtility.ParseQueryString(uri.Query);
+            cursor = queryParameters.Get("cursor");
+        }
+
+        var (groups, nextCursor) = await _service.GetAllAsync(getAllDto.PageSize, cursor);
+        var response = new PageResponse<Group>
+        {
+            Data = groups
+        };
+
+        if (nextCursor != null)
+        {
+            var urlParams = new { getAllDto.PageSize, cursor = nextCursor };
+            response.NextUrl = _urlHelper.Link("GetAllUsers", urlParams);
+        }
+
+        return Ok(response);
     }
 
     // GET: api/Group/5

@@ -1,6 +1,9 @@
 using Challenge04_TenantManagementApi.Models;
 using Microsoft.Graph;
-using Group = Microsoft.Graph.Models.Group;
+using GraphGroup = Microsoft.Graph.Models.Group;
+using DbGroup = Challenge04_TenantManagementApi.Models.Group;
+using Challenge04_TenantManagementApi.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace Challenge04_TenantManagementApi.Services;
 
@@ -8,11 +11,34 @@ public sealed class GroupService
 {
     private readonly ILogger<GroupService> _logger;
     private readonly GraphServiceClient _graphClient;
+    private readonly GraphDbContext _graphDbContext;
 
-    public GroupService(GraphServiceClient graphClient, ILogger<GroupService> logger)
+    public GroupService(GraphServiceClient graphClient, ILogger<GroupService> logger, GraphDbContext graphDbContext)
     {
         _logger = logger;
         _graphClient = graphClient;
+        _graphDbContext = graphDbContext;
+    }
+
+    public async Task<(List<DbGroup>, string?)> GetAllAsync(int pageSize = 10, string? cursor = null)
+    {
+        var query = _graphDbContext.Groups.AsQueryable();
+
+        if (cursor != null)
+        {
+            query = query.Where(group => group.Id.CompareTo(cursor) > 0);
+        }
+
+        var groups = await query.OrderBy(group => group.Id).Take(pageSize + 1).ToListAsync();
+
+        string? nextCursor = null;
+        if (groups.Count > pageSize)
+        {
+            nextCursor = groups.Last().Id;
+            groups.RemoveAt(groups.Count - 1);
+        }
+
+        return (groups, nextCursor);
     }
 
     public async Task<GroupDto> GetAsync(string id)
@@ -25,7 +51,7 @@ public sealed class GroupService
 
     public async Task<GroupDto> AddAsync(CreateGroupDto createGroupDto)
     {
-        var group = new Group
+        var group = new GraphGroup
         {
             Description = createGroupDto.Description,
             DisplayName = createGroupDto.DisplayName,
@@ -43,7 +69,7 @@ public sealed class GroupService
 
     public async Task UpdateAsync(string id, GroupDto groupDto)
     {
-        var group = new Group
+        var group = new GraphGroup
         {
             DisplayName = groupDto.DisplayName,
             MailNickname = groupDto.MailNickname,
@@ -61,7 +87,7 @@ public sealed class GroupService
         _logger.LogInformation("DeletedGroup : {@DeletedGroup}", group);
     }
 
-    private static GroupDto ItemToDto(Group group)
+    private static GroupDto ItemToDto(GraphGroup group)
     {
         return new GroupDto
         {

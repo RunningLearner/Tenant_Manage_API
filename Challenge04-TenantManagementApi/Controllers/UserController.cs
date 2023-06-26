@@ -25,18 +25,18 @@ public sealed class UserController : ControllerBase
     // GET: api/User/5
     [HttpGet(Name = "GetAllUsers")]
     [ExecutionTime]
-    public async Task<ActionResult<PageResponse<User>>> GetAllUser([FromQuery] GetAllUserDto getAllUserDto)
+    public async Task<ActionResult<PageResponse<User>>> GetAllUser([FromQuery] GetAllDto getAllDto)
     {
         string? cursor = null;
 
-        if (!string.IsNullOrEmpty(getAllUserDto.NextUrl))
+        if (!string.IsNullOrEmpty(getAllDto.NextUrl))
         {
-            var uri = new Uri(getAllUserDto.NextUrl);
+            var uri = new Uri(getAllDto.NextUrl);
             var queryParameters = HttpUtility.ParseQueryString(uri.Query);
             cursor = queryParameters.Get("cursor");
         }
 
-        var (users, nextCursor) = await _service.GetAllAsync(getAllUserDto.PageSize, cursor);
+        var (users, nextCursor) = await _service.GetAllAsync(getAllDto.PageSize, cursor);
         var response = new PageResponse<User>
         {
             Data = users
@@ -44,7 +44,7 @@ public sealed class UserController : ControllerBase
 
         if (nextCursor != null)
         {
-            var urlParams = new { getAllUserDto.PageSize, cursor = nextCursor };
+            var urlParams = new { getAllDto.PageSize, cursor = nextCursor };
             response.NextUrl = _urlHelper.Link("GetAllUsers", urlParams);
         }
 
