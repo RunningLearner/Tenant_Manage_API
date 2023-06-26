@@ -22,10 +22,10 @@ public sealed class GroupController : ControllerBase
         _urlHelper = urlHelper;
     }
 
-    // GET: api/User/5
-    [HttpGet(Name = "GetAllUsers")]
+    // GET: api/User
+    [HttpGet(Name = "GetAllGroups")]
     [ExecutionTime]
-    public async Task<ActionResult<PageResponse<Group>>> GetAllUser([FromQuery] GetAllDto getAllDto)
+    public async Task<ActionResult<PageResponse<Group>>> GetAllGroup([FromQuery] GetAllDto getAllDto)
     {
         string? cursor = null;
 
@@ -45,7 +45,7 @@ public sealed class GroupController : ControllerBase
         if (nextCursor != null)
         {
             var urlParams = new { getAllDto.PageSize, cursor = nextCursor };
-            response.NextUrl = _urlHelper.Link("GetAllUsers", urlParams);
+            response.NextUrl = _urlHelper.Link("GetAllGroups", urlParams);
         }
 
         return Ok(response);

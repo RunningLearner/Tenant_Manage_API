@@ -22,7 +22,7 @@ public sealed class UserController : ControllerBase
         _urlHelper = urlHelper;
     }
 
-    // GET: api/User/5
+    // GET: api/User
     [HttpGet(Name = "GetAllUsers")]
     [ExecutionTime]
     public async Task<ActionResult<PageResponse<User>>> GetAllUser([FromQuery] GetAllDto getAllDto)
