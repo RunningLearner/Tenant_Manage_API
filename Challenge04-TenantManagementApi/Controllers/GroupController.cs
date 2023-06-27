@@ -12,13 +12,11 @@ namespace Challenge04_TenantManagementApi.Controllers;
 public sealed class GroupController : ControllerBase
 {
     private readonly GroupService _service;
-    private readonly ILogger<GroupController> _logger;
     private readonly IUrlHelper _urlHelper;
 
-    public GroupController(GroupService service, ILogger<GroupController> logger, IUrlHelper urlHelper)
+    public GroupController(GroupService service, IUrlHelper urlHelper)
     {
         _service = service;
-        _logger = logger;
         _urlHelper = urlHelper;
     }
 

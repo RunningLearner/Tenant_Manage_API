@@ -12,13 +12,11 @@ namespace Challenge04_TenantManagementApi.Controllers;
 public sealed class UserController : ControllerBase
 {
     private readonly UserService _service;
-    private readonly ILogger<UserController> _logger;
     private readonly IUrlHelper _urlHelper;
 
-    public UserController(UserService service, ILogger<UserController> logger, IUrlHelper urlHelper)
+    public UserController(UserService service, IUrlHelper urlHelper)
     {
         _service = service;
-        _logger = logger;
         _urlHelper = urlHelper;
     }
 
