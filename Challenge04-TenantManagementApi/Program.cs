@@ -4,7 +4,7 @@ namespace Challenge04_TenantManagementApi;
 
 public static class Program
 {
-    private static readonly string AppVersion = typeof(Program).Assembly.GetName().Version?.ToString(3);
+    private static readonly string AppVersion = typeof(Program).Assembly.GetName().Version?.ToString(3) ?? "0.0.0";
 
     /// <summary>
     /// 이 application의 진입점
