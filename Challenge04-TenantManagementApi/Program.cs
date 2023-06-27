@@ -6,6 +6,10 @@ public static class Program
 {
     private static readonly string AppVersion = typeof(Program).Assembly.GetName().Version?.ToString(3);
 
+    /// <summary>
+    /// 이 application의 진입점
+    /// </summary>
+    /// <param name="args">CLI환경에서 application에 주어질 인수들</param>
     public static void Main(string[] args)
     {
         var configuration = new ConfigurationBuilder()

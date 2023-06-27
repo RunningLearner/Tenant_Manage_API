@@ -21,7 +21,10 @@ public class Startup
         _configuration = configuration;
     }
 
-    // This method gets called by the runtime. Use this method to add services to the container.
+    /// <summary>
+    /// 런타입에 호출되어 서비스를 컨테이너에 등록합니다.
+    /// </summary>
+    /// <param name="services">의존성 주입에 사용될 컨테이너</param>
     public void ConfigureServices(IServiceCollection services)
     {
         services.AddHealthChecks()
@@ -144,7 +147,11 @@ public class Startup
         return (tenantId, clientId, certFilePath);
     }
 
-    // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+    /// <summary>
+    /// 런타임에 호출되어 미들웨어들의 순서를 정하거나 설정을 한다.
+    /// </summary>
+    /// <param name="app"></param>
+    /// <param name="env"></param>
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
         if (env.IsDevelopment())

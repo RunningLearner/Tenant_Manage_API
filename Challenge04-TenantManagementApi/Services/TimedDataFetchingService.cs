@@ -22,6 +22,10 @@ public sealed class TimedDataFetchingService : BackgroundService
         _graphClient = graphClient;
     }
 
+    /// <summary>
+    /// 앱이 실행되는 동안 유저와 그룹의 정보를 받아와 DB에 저장합니다.
+    /// </summary>
+    /// <param name="stoppingToken">작업을 중단시킬 수 있는 토큰</param>
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         _logger.LogInformation("Timed Data Fetching Service is starting.");

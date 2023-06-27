@@ -10,6 +10,12 @@ public class ApiKeyAuthAttribute : Attribute, IAsyncActionFilter
     private IConfiguration? _configuration;
     private ILogger<ApiKeyAuthAttribute>? _logger;
 
+    /// <summary>
+    /// 해당 Attribute를 가진 메서드나 클래스는 작동 전
+    /// 요청이 API 키를 가지고 있는지 검증한다.
+    /// </summary>
+    /// <param name="context">호출될 시점의 맥락의 정보</param>
+    /// <param name="next">해당 필터의 다음에 올 작동</param>
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
         _configuration ??= context.HttpContext.RequestServices.GetRequiredService<IConfiguration>();
