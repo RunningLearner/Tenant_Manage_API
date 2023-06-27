@@ -26,22 +26,22 @@ public sealed class GroupService
     /// <param name="pageSize">가져올 정보의 수량</param>
     /// <param name="cursor">시작할 위치를 가리키는 커서</param>
     /// <returns>그룹의 리스트, 다음 리스트의 시작을 가리키는 커서</returns>
-    public async Task<(List<DbGroup>, string?)> GetAllAsync(int pageSize = 10, string? cursor = null)
+    public async Task<(List<DbGroup>, DateTimeOffset?)> GetAllAsync(int pageSize = 10, DateTimeOffset? cursor = null)
     {
         var query = _graphDbContext.Groups.AsQueryable();
 
         if (cursor != null)
         {
-            query = query.Where(group => group.Id.CompareTo(cursor) > 0);
+            query = query.Where(group => group.CreatedDateTime > cursor);
         }
 
-        var groups = await query.OrderBy(group => group.Id).Take(pageSize + 1).ToListAsync();
+        var groups = await query.OrderBy(group => group.CreatedDateTime).Take(pageSize + 1).ToListAsync();
 
-        string? nextCursor = null;
+        DateTimeOffset? nextCursor = null;
 
         if (groups.Count > pageSize)
         {
-            nextCursor = groups.Last().Id;
+            nextCursor = groups.Last().CreatedDateTime;
             groups.RemoveAt(groups.Count - 1);
         }
 
@@ -140,7 +140,8 @@ public sealed class GroupService
             Id = group.Id!,
             DisplayName = group.DisplayName,
             Description = group.Description,
-            MailNickname = group.MailNickname
+            MailNickname = group.MailNickname,
+            CreatedDateTime = group.CreatedDateTime
         };
     }
 }

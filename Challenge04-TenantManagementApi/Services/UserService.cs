@@ -27,22 +27,22 @@ public sealed class UserService
     /// <param name="pageSize">가져올 정보의 수량</param>
     /// <param name="cursor">시작할 위치를 가리키는 커서</param>
     /// <returns>유저의 목록, 다음 시작할 위치를 가리키는 커서</returns>
-    public async Task<(List<DbUser>, string?)> GetAllAsync(int pageSize = 10, string? cursor = null)
+    public async Task<(List<DbUser>, DateTimeOffset?)> GetAllAsync(int pageSize = 10, DateTimeOffset? cursor = null)
     {
         var query = _graphDbContext.Users.AsQueryable();
 
         if (cursor != null)
         {
-            query = query.Where(user => user.Id.CompareTo(cursor) > 0);
+            query = query.Where(user => user.CreatedDateTime > cursor);
         }
 
-        var users = await query.OrderBy(user => user.Id).Take(pageSize + 1).ToListAsync();
+        var users = await query.OrderBy(user => user.CreatedDateTime).Take(pageSize + 1).ToListAsync();
 
-        string? nextCursor = null;
+        DateTimeOffset? nextCursor = null;
 
         if (users.Count > pageSize)
         {
-            nextCursor = users.Last().Id;
+            nextCursor = users.Last().CreatedDateTime;
             users.RemoveAt(users.Count - 1);
         }
 
@@ -144,7 +144,8 @@ public sealed class UserService
             Id = user.Id!,
             DisplayName = user.DisplayName,
             UserPrincipalName = user.UserPrincipalName,
-            MailNickname = user.MailNickname
+            MailNickname = user.MailNickname,
+            CreatedDateTime = user.CreatedDateTime
         };
     }
 }

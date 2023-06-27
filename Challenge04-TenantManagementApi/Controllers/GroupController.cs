@@ -30,13 +30,11 @@ public sealed class GroupController : ControllerBase
     [ExecutionTime]
     public async Task<ActionResult<PageResponse<Group>>> GetAllGroup([FromQuery] GetAllDto getAllDto)
     {
-        string? cursor = null;
+        DateTimeOffset? cursor = null;
 
         if (!string.IsNullOrEmpty(getAllDto.NextUrl))
         {
-            var uri = new Uri(getAllDto.NextUrl);
-            var queryParameters = HttpUtility.ParseQueryString(uri.Query);
-            cursor = queryParameters.Get("cursor");
+            cursor = GetDateTimeStringFromUrl(getAllDto.NextUrl);
         }
 
         var (groups, nextCursor) = await _service.GetAllAsync(getAllDto.PageSize, cursor);
@@ -111,5 +109,19 @@ public sealed class GroupController : ControllerBase
     {
         await _service.DeleteAsync(id);
         return NoContent();
+    }
+
+    private static DateTimeOffset GetDateTimeStringFromUrl(string NextUrl)
+    {
+        var uri = new Uri(NextUrl);
+        var queryParameters = HttpUtility.ParseQueryString(uri.Query);
+        var cursor = queryParameters.Get("cursor");
+
+        if (!DateTimeOffset.TryParse(cursor, out DateTimeOffset parsed))
+        {
+            throw new ArgumentException($"'{cursor}'은 DateTimeOffset 형식이 아닙니다.");
+        }
+
+        return parsed;
     }
 }

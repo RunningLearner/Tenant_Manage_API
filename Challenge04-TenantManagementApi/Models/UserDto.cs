@@ -19,4 +19,8 @@ public record UserDto
     [Required]
     [JsonProperty(PropertyName = "mailNickname")]
     public string? MailNickname { get; init; }
+
+    [Required]
+    [JsonProperty(PropertyName = "createdDateTime")]
+    public DateTimeOffset CreatedDateTime { get; init; }
 }

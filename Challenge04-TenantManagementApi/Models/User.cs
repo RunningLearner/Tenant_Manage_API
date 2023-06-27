@@ -9,4 +9,6 @@ public class User
     public string? UserPrincipalName { get; set; }
 
     public string? MailNickname { get; set; }
+
+    public required DateTimeOffset CreatedDateTime { get; set; }
 }
