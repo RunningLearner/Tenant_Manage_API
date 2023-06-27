@@ -97,7 +97,8 @@ public class Startup
                 });
         });
 
-        ValidateConfigurations(out string? tenantId, out string? clientId, out string? certFilePath);
+        AssignConfigurations(out string? tenantId, out string? clientId, out string? certFilePath);
+        ValidateConfigurations(tenantId, clientId, certFilePath);
         var clientCertificate = new X509Certificate2(certFilePath!, string.Empty, X509KeyStorageFlags.MachineKeySet);
         var clientCertCredential = new ClientCertificateCredential(tenantId, clientId, clientCertificate);
 
@@ -112,12 +113,15 @@ public class Startup
         services.AddScoped<GroupService>();
     }
 
-    private void ValidateConfigurations(out string? tenantId, out string? clientId, out string? certFilePath)
+    private void AssignConfigurations(out string? tenantId, out string? clientId, out string? certFilePath)
     {
         tenantId = _configuration["AzureAd:TenantId"];
         clientId = _configuration["AzureAd:ClientId"];
         certFilePath = _configuration["AzureAd:CertFile"];
+    }
 
+    private static void ValidateConfigurations(string? tenantId, string? clientId, string? certFilePath)
+    {
         if (string.IsNullOrWhiteSpace(tenantId))
         {
             throw new ArgumentNullException(nameof(tenantId), "설정 파일 내 tenantId의 값이 비어있습니다.");
