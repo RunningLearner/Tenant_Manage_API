@@ -20,6 +20,12 @@ public sealed class GroupService
         _graphDbContext = graphDbContext;
     }
 
+    /// <summary>
+    /// pageSize 만큼 그룹의 정보를 조회
+    /// </summary>
+    /// <param name="pageSize"></param>
+    /// <param name="cursor"></param>
+    /// <returns></returns>
     public async Task<(List<DbGroup>, string?)> GetAllAsync(int pageSize = 10, string? cursor = null)
     {
         var query = _graphDbContext.Groups.AsQueryable();
@@ -42,6 +48,12 @@ public sealed class GroupService
         return (groups, nextCursor);
     }
 
+    /// <summary>
+    /// 특정 그룹의 정보를 조회 
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    /// <exception cref="KeyNotFoundException"></exception>
     public async Task<GroupDto> GetAsync(string id)
     {
         var group = await _graphDbContext.Groups.FindAsync(id);
@@ -56,6 +68,11 @@ public sealed class GroupService
         return ItemToDto(group);
     }
 
+    /// <summary>
+    /// 새로운 그룹을 생성
+    /// </summary>
+    /// <param name="createGroupDto"></param>
+    /// <returns></returns>
     public async Task<GroupDto> AddAsync(CreateGroupDto createGroupDto)
     {
         var group = new GraphGroup
@@ -74,6 +91,12 @@ public sealed class GroupService
         return ItemToDto(createdGroup!);
     }
 
+    /// <summary>
+    /// 특정 그룹의 정보를 수정
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="groupDto"></param>
+    /// <returns></returns>
     public async Task UpdateAsync(string id, GroupDto groupDto)
     {
         var group = new GraphGroup
@@ -87,6 +110,11 @@ public sealed class GroupService
         _logger.LogInformation("UpdatedGroup : {@Group}", group);
     }
 
+    /// <summary>
+    /// 특정 그룹을 삭제
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
     public async Task DeleteAsync(string id)
     {
         var group = await _graphClient.Groups[id].GetAsync();

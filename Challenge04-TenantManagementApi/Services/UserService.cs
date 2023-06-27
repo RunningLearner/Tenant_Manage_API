@@ -21,6 +21,12 @@ public sealed class UserService
         _graphDbContext = graphDbContext;
     }
 
+    /// <summary>
+    /// pageSize의 유저의 정보를 조회
+    /// </summary>
+    /// <param name="pageSize"></param>
+    /// <param name="cursor"></param>
+    /// <returns></returns>
     public async Task<(List<DbUser>, string?)> GetAllAsync(int pageSize = 10, string? cursor = null)
     {
         var query = _graphDbContext.Users.AsQueryable();
@@ -43,6 +49,12 @@ public sealed class UserService
         return (users, nextCursor);
     }
 
+    /// <summary>
+    /// 특정 유저의 정보를 조회
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    /// <exception cref="KeyNotFoundException"></exception>
     public async Task<UserDto> GetAsync(string id)
     {
         var user = await _graphDbContext.Users.FindAsync(id);
@@ -57,6 +69,11 @@ public sealed class UserService
         return ItemToDto(user);
     }
 
+    /// <summary>
+    /// 새로운 유저를 생성
+    /// </summary>
+    /// <param name="createUserDto"></param>
+    /// <returns></returns>
     public async Task<UserDto> AddAsync(CreateUserDto createUserDto)
     {
         var user = new GrpahUser
@@ -78,6 +95,12 @@ public sealed class UserService
         return ItemToDto(createdUser!);
     }
 
+    /// <summary>
+    /// 특정 유저의 정보를 수정
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="userDto"></param>
+    /// <returns></returns>
     public async Task UpdateAsync(string id, UserDto userDto)
     {
         var user = new GrpahUser
@@ -91,6 +114,11 @@ public sealed class UserService
         _logger.LogInformation("UpdatedUser : {@User}", user);
     }
 
+    /// <summary>
+    /// 특정 유저를 삭제
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
     public async Task DeleteAsync(string id)
     {
         var user = await _graphClient.Users[id].GetAsync();

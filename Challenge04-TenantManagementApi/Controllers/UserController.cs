@@ -20,7 +20,11 @@ public sealed class UserController : ControllerBase
         _urlHelper = urlHelper;
     }
 
-    // GET: api/User
+    /// <summary>
+    /// GET: api/User
+    /// </summary>
+    /// <param name="getAllDto"></param>
+    /// <returns></returns>
     [HttpGet(Name = "GetAllUsers")]
     [ExecutionTime]
     public async Task<ActionResult<PageResponse<User>>> GetAllUser([FromQuery] GetAllDto getAllDto)
@@ -49,7 +53,11 @@ public sealed class UserController : ControllerBase
         return Ok(response);
     }
 
-    // GET: api/User/5
+    /// <summary>
+    /// GET: api/User/5
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
     [HttpGet("{id}")]
     [ExecutionTime]
     public async Task<ActionResult<UserDto>> GetUser([Required] string id)
@@ -57,8 +65,11 @@ public sealed class UserController : ControllerBase
         return await _service.GetAsync(id);
     }
 
-    // POST: api/User
-    // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+    /// <summary>
+    /// POST: api/User
+    /// </summary>
+    /// <param name="userDto"></param>
+    /// <returns></returns>
     [HttpPost]
     [ApiKeyAuth]
     [ExecutionTime]
@@ -68,8 +79,12 @@ public sealed class UserController : ControllerBase
         return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
     }
 
-    // PUT: api/User/5
-    // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+    /// <summary>
+    /// PUT: api/User/5
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="userDto"></param>
+    /// <returns></returns>
     [HttpPut("{id}")]
     [ApiKeyAuth]
     [ExecutionTime]
@@ -79,7 +94,11 @@ public sealed class UserController : ControllerBase
         return NoContent();
     }
 
-    // DELETE: api/User/5
+    /// <summary>
+    /// DELETE: api/User/5
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
     [HttpDelete("{id}")]
     [ApiKeyAuth]
     [ExecutionTime]

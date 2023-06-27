@@ -20,7 +20,11 @@ public sealed class GroupController : ControllerBase
         _urlHelper = urlHelper;
     }
 
-    // GET: api/User
+    /// <summary>
+    /// GET: api/User
+    /// </summary>
+    /// <param name="getAllDto"></param>
+    /// <returns></returns>
     [HttpGet(Name = "GetAllGroups")]
     [ExecutionTime]
     public async Task<ActionResult<PageResponse<Group>>> GetAllGroup([FromQuery] GetAllDto getAllDto)
@@ -49,7 +53,11 @@ public sealed class GroupController : ControllerBase
         return Ok(response);
     }
 
-    // GET: api/Group/5
+    /// <summary>
+    /// GET: api/Group/5
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
     [HttpGet("{id}")]
     [ExecutionTime]
     public async Task<ActionResult<GroupDto>> GetGroup([Required] string id)
@@ -57,8 +65,11 @@ public sealed class GroupController : ControllerBase
         return await _service.GetAsync(id);
     }
 
-    // POST: api/Group
-    // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+    /// <summary>
+    /// POST: api/Group
+    /// </summary>
+    /// <param name="groupDto"></param>
+    /// <returns></returns>
     [HttpPost]
     [ApiKeyAuth]
     [ExecutionTime]
@@ -68,8 +79,12 @@ public sealed class GroupController : ControllerBase
         return CreatedAtAction(nameof(GetGroup), new { id = group.Id }, group);
     }
 
-    // PUT: api/Group/5
-    // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+    /// <summary>
+    /// PUT: api/Group/5
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="groupDto"></param>
+    /// <returns></returns>
     [HttpPut("{id}")]
     [ApiKeyAuth]
     [ExecutionTime]
@@ -79,7 +94,11 @@ public sealed class GroupController : ControllerBase
         return NoContent();
     }
 
-    // DELETE: api/Group/5
+    /// <summary>
+    /// DELETE: api/Group/5
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
     [HttpDelete("{id}")]
     [ApiKeyAuth]
     [ExecutionTime]
