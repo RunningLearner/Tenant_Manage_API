@@ -4,6 +4,8 @@ namespace Challenge04_TenantManagementApi;
 
 public static class Program
 {
+    private static readonly string AppVersion = typeof(Program).Assembly.GetName().Version?.ToString(3);
+
     public static void Main(string[] args)
     {
         var configuration = new ConfigurationBuilder()
@@ -13,6 +15,7 @@ public static class Program
 
         Log.Logger = new LoggerConfiguration()
                 .ReadFrom.Configuration(configuration)
+                .Enrich.WithProperty("version", AppVersion)
                 .CreateLogger();
 
         try
@@ -33,7 +36,9 @@ public static class Program
     private static IHostBuilder CreateHostBuilder(string[] args)
     {
         return Host.CreateDefaultBuilder(args)
-                .UseSerilog()
+                .UseSerilog((context, services, configuration) => configuration
+                    .ReadFrom.Configuration(context.Configuration)
+                    .Enrich.WithProperty("version", AppVersion))
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
