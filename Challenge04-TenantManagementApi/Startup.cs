@@ -117,11 +117,12 @@ public class Startup
         var tenantId = _configuration["AzureAd:TenantId"];
         var clientId = _configuration["AzureAd:ClientId"];
         var certFilePath = _configuration["AzureAd:CertFile"];
-        ValidateConfigurations(tenantId, clientId, certFilePath);
-        return (tenantId!, clientId!, certFilePath!);
+        var (validatedTenantId, validatedClientId, validatedCertFilePath) = ValidateConfigurations(tenantId, clientId, certFilePath);
+
+        return (validatedTenantId, validatedClientId, validatedCertFilePath);
     }
 
-    private static void ValidateConfigurations(string? tenantId, string? clientId, string? certFilePath)
+    private static (string, string, string) ValidateConfigurations(string? tenantId, string? clientId, string? certFilePath)
     {
         if (string.IsNullOrWhiteSpace(tenantId))
         {
@@ -139,6 +140,8 @@ public class Startup
         {
             throw new FileNotFoundException("인증에 필요한 pfx 파일을 찾을 수 없습니다.");
         }
+
+        return (tenantId, clientId, certFilePath);
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
