@@ -41,12 +41,12 @@ public class ExceptionHandlingMiddleware : IMiddleware
             case ODataError ex:
                 response.StatusCode = ex.ResponseStatusCode;
                 break;
-            case ArgumentOutOfRangeException:
-                response.StatusCode = (int)HttpStatusCode.BadRequest;
-                break;
             case KeyNotFoundException:
             case ArgumentNullException:
                 response.StatusCode = (int)HttpStatusCode.NotFound;
+                break;
+            case ArgumentException:
+                response.StatusCode = (int)HttpStatusCode.BadRequest;
                 break;
             default:
                 _logger.LogError(exception, "서버 에러 발생");
