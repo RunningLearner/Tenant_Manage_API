@@ -23,9 +23,9 @@ public sealed class GroupService
     /// <summary>
     /// pageSize 만큼 그룹의 정보를 조회
     /// </summary>
-    /// <param name="pageSize"></param>
-    /// <param name="cursor"></param>
-    /// <returns></returns>
+    /// <param name="pageSize">가져올 정보의 수량</param>
+    /// <param name="cursor">시작할 위치를 가리키는 커서</param>
+    /// <returns>그룹의 리스트, 다음 리스트의 시작을 가리키는 커서</returns>
     public async Task<(List<DbGroup>, string?)> GetAllAsync(int pageSize = 10, string? cursor = null)
     {
         var query = _graphDbContext.Groups.AsQueryable();
@@ -51,8 +51,8 @@ public sealed class GroupService
     /// <summary>
     /// 특정 그룹의 정보를 조회 
     /// </summary>
-    /// <param name="id"></param>
-    /// <returns></returns>
+    /// <param name="id">조회할 그룹의 ID</param>
+    /// <returns>조회된 그룹의 정보</returns>
     /// <exception cref="KeyNotFoundException"></exception>
     public async Task<GroupDto> GetAsync(string id)
     {
@@ -71,8 +71,8 @@ public sealed class GroupService
     /// <summary>
     /// 새로운 그룹을 생성
     /// </summary>
-    /// <param name="createGroupDto"></param>
-    /// <returns></returns>
+    /// <param name="createGroupDto">그룹 생성에 사용될 정보</param>
+    /// <returns>생성된 그룹의 정보</returns>
     public async Task<GroupDto> AddAsync(CreateGroupDto createGroupDto)
     {
         var group = new GraphGroup
@@ -94,8 +94,8 @@ public sealed class GroupService
     /// <summary>
     /// 특정 그룹의 정보를 수정
     /// </summary>
-    /// <param name="id"></param>
-    /// <param name="groupDto"></param>
+    /// <param name="id">수정하려는 그룹의 ID</param>
+    /// <param name="groupDto">수정에 사용될 정보</param>
     /// <returns></returns>
     public async Task UpdateAsync(string id, GroupDto groupDto)
     {
@@ -113,7 +113,7 @@ public sealed class GroupService
     /// <summary>
     /// 특정 그룹을 삭제
     /// </summary>
-    /// <param name="id"></param>
+    /// <param name="id">삭제하고자 하는 그룹의 ID</param>
     /// <returns></returns>
     public async Task DeleteAsync(string id)
     {
