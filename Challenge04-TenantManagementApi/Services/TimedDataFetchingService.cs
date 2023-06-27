@@ -54,13 +54,12 @@ public sealed class TimedDataFetchingService : BackgroundService
     {
         var retryHandlerOption = new RetryHandlerOption
         {
-            MaxRetry = 7,
-            ShouldRetry = (delay, attempt, message) => true
+            MaxRetry = 5,
         };
 
         var usersResponse = await _graphClient.Users.GetAsync(requestConfiguration =>
         {
-            requestConfiguration.QueryParameters.Select = new[] { "id", "displayName", "userPrincipalName", "mailNickname" };
+            requestConfiguration.QueryParameters.Select = new[] { "id", "displayName", "userPrincipalName", "mailNickname", "createdDateTime" };
             requestConfiguration.Options.Add(retryHandlerOption);
         }) ?? throw new ArgumentNullException("usersResponse", "No users were found.");
 
@@ -76,7 +75,8 @@ public sealed class TimedDataFetchingService : BackgroundService
                         Id = user.Id!,
                         DisplayName = user.DisplayName,
                         UserPrincipalName = user.UserPrincipalName,
-                        MailNickname = user.MailNickname
+                        MailNickname = user.MailNickname,
+                        CreatedDateTime = user.CreatedDateTime ?? DateTimeOffset.Now
                     });
                 }
                 else
@@ -84,9 +84,11 @@ public sealed class TimedDataFetchingService : BackgroundService
                     dbUser.DisplayName = user.DisplayName;
                     dbUser.UserPrincipalName = user.UserPrincipalName;
                     dbUser.MailNickname = user.MailNickname;
+                    dbUser.CreatedDateTime = user.CreatedDateTime ?? DateTimeOffset.Now;
                     dbContext.Users.Update(dbUser);
                 }
 
+                await dbContext.SaveChangesAsync();
                 return true;
             });
 
@@ -98,12 +100,11 @@ public sealed class TimedDataFetchingService : BackgroundService
         var retryHandlerOption = new RetryHandlerOption
         {
             MaxRetry = 7,
-            ShouldRetry = (delay, attempt, message) => true
         };
 
         var groupsResponse = await _graphClient.Groups.GetAsync(requestConfiguration =>
         {
-            requestConfiguration.QueryParameters.Select = new[] { "id", "displayName", "description", "mailNickname" };
+            requestConfiguration.QueryParameters.Select = new[] { "id", "displayName", "description", "mailNickname", "createdDateTime" };
             requestConfiguration.Options.Add(retryHandlerOption);
         }) ?? throw new ArgumentNullException("groupsResponse", "No users were found.");
 
@@ -119,7 +120,8 @@ public sealed class TimedDataFetchingService : BackgroundService
                     Id = group.Id!,
                     DisplayName = group.DisplayName,
                     Description = group.Description,
-                    MailNickname = group.MailNickname
+                    MailNickname = group.MailNickname,
+                    CreatedDateTime = group.CreatedDateTime ?? DateTimeOffset.Now
                 });
             }
             else
@@ -127,6 +129,7 @@ public sealed class TimedDataFetchingService : BackgroundService
                 dbGroup.DisplayName = group.DisplayName;
                 dbGroup.Description = group.Description;
                 dbGroup.MailNickname = group.MailNickname;
+                dbGroup.CreatedDateTime = group.CreatedDateTime ?? DateTimeOffset.Now;
                 dbContext.Groups.Update(dbGroup);
             }
 
