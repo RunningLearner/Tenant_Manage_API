@@ -97,9 +97,8 @@ public class Startup
                 });
         });
 
-        AssignConfigurations(out string? tenantId, out string? clientId, out string? certFilePath);
-        ValidateConfigurations(tenantId, clientId, certFilePath);
-        var clientCertificate = new X509Certificate2(certFilePath!, string.Empty, X509KeyStorageFlags.MachineKeySet);
+        var (tenantId, clientId, certFilePath) = GetConfigurations();
+        var clientCertificate = new X509Certificate2(certFilePath, string.Empty, X509KeyStorageFlags.MachineKeySet);
         var clientCertCredential = new ClientCertificateCredential(tenantId, clientId, clientCertificate);
 
         // Graph API 등록
@@ -113,11 +112,13 @@ public class Startup
         services.AddScoped<GroupService>();
     }
 
-    private void AssignConfigurations(out string? tenantId, out string? clientId, out string? certFilePath)
+    private (string, string, string) GetConfigurations()
     {
-        tenantId = _configuration["AzureAd:TenantId"];
-        clientId = _configuration["AzureAd:ClientId"];
-        certFilePath = _configuration["AzureAd:CertFile"];
+        var tenantId = _configuration["AzureAd:TenantId"];
+        var clientId = _configuration["AzureAd:ClientId"];
+        var certFilePath = _configuration["AzureAd:CertFile"];
+        ValidateConfigurations(tenantId, clientId, certFilePath);
+        return (tenantId!, clientId!, certFilePath!);
     }
 
     private static void ValidateConfigurations(string? tenantId, string? clientId, string? certFilePath)
