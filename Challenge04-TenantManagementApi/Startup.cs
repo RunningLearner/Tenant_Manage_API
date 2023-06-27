@@ -74,7 +74,7 @@ public class Startup
                 Type = SecuritySchemeType.ApiKey, // 인증 형태
                 In = ParameterLocation.Header, // 인증 정보가 추가될 위치
                 Name = "X-API-KEY", // 여기서는 HTTP Header의 Key값, 규격상 Authorization 헤더는 쓰면 안 된다
-                Description = "미리 약속한 API Key값을 입력합니다. 이 값은 HyundaiM365Api 제품의 환경설정에서 설정합니다."
+                Description = "미리 약속한 API Key값을 입력합니다."
             });
 
             // 인증 버튼에서 입력받은 인증 정보를 Swagger에서 보내는 실제 HTTP 요청에 적용한다.
