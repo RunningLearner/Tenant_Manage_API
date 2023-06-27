@@ -100,12 +100,7 @@ public class Startup
                 });
         });
 
-        var (tenantId, clientId, certFilePath) = GetConfigurations();
-        var clientCertificate = new X509Certificate2(certFilePath, string.Empty, X509KeyStorageFlags.MachineKeySet);
-        var clientCertCredential = new ClientCertificateCredential(tenantId, clientId, clientCertificate);
-
-        // Graph API 등록
-        var graphServiceClient = new GraphServiceClient(clientCertCredential);
+        GraphServiceClient graphServiceClient = InitGraphClient();
         services.AddSingleton(graphServiceClient);
 
         // 주기적으로 작동하는 data fetcher 등록
@@ -115,36 +110,41 @@ public class Startup
         services.AddScoped<GroupService>();
     }
 
-    private (string, string, string) GetConfigurations()
+    private GraphServiceClient InitGraphClient()
     {
         var tenantId = _configuration["AzureAd:TenantId"];
         var clientId = _configuration["AzureAd:ClientId"];
         var certFilePath = _configuration["AzureAd:CertFile"];
-        var (validatedTenantId, validatedClientId, validatedCertFilePath) = ValidateConfigurations(tenantId, clientId, certFilePath);
+        ValidateConfigurations(tenantId, clientId, certFilePath);
 
-        return (validatedTenantId, validatedClientId, validatedCertFilePath);
+        var clientCertificate = new X509Certificate2(certFilePath!, string.Empty, X509KeyStorageFlags.MachineKeySet);
+        var clientCertCredential = new ClientCertificateCredential(tenantId, clientId, clientCertificate);
+
+        // Graph API를 사용하기 위한 SDK 초기화
+        return new GraphServiceClient(clientCertCredential);
     }
 
-    private static (string, string, string) ValidateConfigurations(string? tenantId, string? clientId, string? certFilePath)
+    private static void ValidateConfigurations(string? tenantId, string? clientId, string? certFilePath)
     {
         if (string.IsNullOrWhiteSpace(tenantId))
         {
             throw new ArgumentNullException(nameof(tenantId), "설정 파일 내 tenantId의 값이 비어있습니다.");
         }
+
         if (string.IsNullOrWhiteSpace(clientId))
         {
             throw new ArgumentNullException(nameof(clientId), "설정 파일 내 clientId의 값이 비어있습니다.");
         }
+
         if (string.IsNullOrWhiteSpace(certFilePath))
         {
             throw new ArgumentNullException(nameof(certFilePath), "설정 파일 내 certFilePath의 값이 비어있습니다.");
         }
+
         if (!File.Exists(certFilePath))
         {
             throw new FileNotFoundException("인증에 필요한 pfx 파일을 찾을 수 없습니다.");
         }
-
-        return (tenantId, clientId, certFilePath);
     }
 
     /// <summary>
