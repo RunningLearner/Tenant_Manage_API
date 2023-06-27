@@ -55,36 +55,36 @@ public sealed class TimedDataFetchingService : BackgroundService
         };
 
         var usersResponse = await _graphClient.Users.GetAsync(requestConfiguration =>
-         {
-             requestConfiguration.QueryParameters.Select = new[] { "id", "displayName", "userPrincipalName", "mailNickname" };
-             requestConfiguration.Options.Add(retryHandlerOption);
-         }) ?? throw new ArgumentNullException("usersResponse", "No users were found.");
+        {
+            requestConfiguration.QueryParameters.Select = new[] { "id", "displayName", "userPrincipalName", "mailNickname" };
+            requestConfiguration.Options.Add(retryHandlerOption);
+        }) ?? throw new ArgumentNullException("usersResponse", "No users were found.");
 
         var pageIterator = PageIterator<GraphUser, UserCollectionResponse>
-                    .CreatePageIterator(_graphClient, usersResponse, async (user) =>
+            .CreatePageIterator(_graphClient, usersResponse, async (user) =>
+            {
+                var dbUser = await dbContext.Users.FindAsync(user.Id);
+
+                if (dbUser == null)
+                {
+                    var res = dbContext.Users.Add(new DbUser
                     {
-                        var dbUser = await dbContext.Users.FindAsync(user.Id);
-
-                        if (dbUser == null)
-                        {
-                            var res = dbContext.Users.Add(new DbUser
-                            {
-                                Id = user.Id!,
-                                DisplayName = user.DisplayName,
-                                UserPrincipalName = user.UserPrincipalName,
-                                MailNickname = user.MailNickname
-                            });
-                        }
-                        else
-                        {
-                            dbUser.DisplayName = user.DisplayName;
-                            dbUser.UserPrincipalName = user.UserPrincipalName;
-                            dbUser.MailNickname = user.MailNickname;
-                            dbContext.Users.Update(dbUser);
-                        }
-
-                        return true;
+                        Id = user.Id!,
+                        DisplayName = user.DisplayName,
+                        UserPrincipalName = user.UserPrincipalName,
+                        MailNickname = user.MailNickname
                     });
+                }
+                else
+                {
+                    dbUser.DisplayName = user.DisplayName;
+                    dbUser.UserPrincipalName = user.UserPrincipalName;
+                    dbUser.MailNickname = user.MailNickname;
+                    dbContext.Users.Update(dbUser);
+                }
+
+                return true;
+            });
 
         await pageIterator.IterateAsync();
     }
@@ -98,37 +98,37 @@ public sealed class TimedDataFetchingService : BackgroundService
         };
 
         var groupsResponse = await _graphClient.Groups.GetAsync(requestConfiguration =>
-         {
-             requestConfiguration.QueryParameters.Select = new[] { "id", "displayName", "description", "mailNickname" };
-             requestConfiguration.Options.Add(retryHandlerOption);
-         }) ?? throw new ArgumentNullException("groupsResponse", "No users were found.");
+        {
+            requestConfiguration.QueryParameters.Select = new[] { "id", "displayName", "description", "mailNickname" };
+            requestConfiguration.Options.Add(retryHandlerOption);
+        }) ?? throw new ArgumentNullException("groupsResponse", "No users were found.");
 
         var pageIterator = PageIterator<GraphGroup, GroupCollectionResponse>
-                    .CreatePageIterator(_graphClient, groupsResponse, async (group) =>
-                    {
-                        var dbGroup = await dbContext.Groups.FindAsync(group.Id);
+        .CreatePageIterator(_graphClient, groupsResponse, async (group) =>
+        {
+            var dbGroup = await dbContext.Groups.FindAsync(group.Id);
 
-                        if (dbGroup == null)
-                        {
-                            dbContext.Groups.Add(new DbGroup
-                            {
-                                Id = group.Id!,
-                                DisplayName = group.DisplayName,
-                                Description = group.Description,
-                                MailNickname = group.MailNickname
-                            });
-                        }
-                        else
-                        {
-                            dbGroup.DisplayName = group.DisplayName;
-                            dbGroup.Description = group.Description;
-                            dbGroup.MailNickname = group.MailNickname;
-                            dbContext.Groups.Update(dbGroup);
-                        }
+            if (dbGroup == null)
+            {
+                dbContext.Groups.Add(new DbGroup
+                {
+                    Id = group.Id!,
+                    DisplayName = group.DisplayName,
+                    Description = group.Description,
+                    MailNickname = group.MailNickname
+                });
+            }
+            else
+            {
+                dbGroup.DisplayName = group.DisplayName;
+                dbGroup.Description = group.Description;
+                dbGroup.MailNickname = group.MailNickname;
+                dbContext.Groups.Update(dbGroup);
+            }
 
-                        await dbContext.SaveChangesAsync();
-                        return true;
-                    });
+            await dbContext.SaveChangesAsync();
+            return true;
+        });
 
         await pageIterator.IterateAsync();
     }
