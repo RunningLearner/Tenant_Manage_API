@@ -49,6 +49,11 @@ public class ExceptionHandlingMiddleware : IMiddleware
                 problemDetails.Status = ex.ResponseStatusCode;
                 problemDetails.Type = $"https://httpstatuses.com/{ex.ResponseStatusCode}";
                 break;
+            case UnauthorizedAccessException:
+                response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                problemDetails.Status = (int)HttpStatusCode.Unauthorized;
+                problemDetails.Type = "https://httpstatuses.com/401";
+                break;
             case KeyNotFoundException:
             case ArgumentNullException:
                 response.StatusCode = (int)HttpStatusCode.NotFound;
