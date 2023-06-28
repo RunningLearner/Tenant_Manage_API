@@ -34,12 +34,16 @@ public class ExceptionHandlingMiddleware : IMiddleware
     private async Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
         context.Response.ContentType = "application/json";
+
         var response = context.Response;
+        response.StatusCode = (int)HttpStatusCode.InternalServerError;
+
         var problemDetails = new ProblemDetails
         {
             Instance = context.Request?.Path,
             Title = exception.GetType().Name,
-            Detail = exception.Message
+            Detail = exception.Message,
+            Status = (int)HttpStatusCode.InternalServerError,
         };
 
         switch (exception)
@@ -47,34 +51,25 @@ public class ExceptionHandlingMiddleware : IMiddleware
             case ODataError ex:
                 response.StatusCode = ex.ResponseStatusCode;
                 problemDetails.Status = ex.ResponseStatusCode;
-                problemDetails.Type = $"https://httpstatuses.com/{ex.ResponseStatusCode}";
                 break;
             case UnauthorizedAccessException:
                 response.StatusCode = (int)HttpStatusCode.Unauthorized;
                 problemDetails.Status = (int)HttpStatusCode.Unauthorized;
-                problemDetails.Type = "https://httpstatuses.com/401";
                 break;
             case KeyNotFoundException:
             case ArgumentNullException:
                 response.StatusCode = (int)HttpStatusCode.NotFound;
                 problemDetails.Status = (int)HttpStatusCode.NotFound;
-                problemDetails.Type = "https://httpstatuses.com/404";
                 break;
             case ArgumentException:
                 response.StatusCode = (int)HttpStatusCode.BadRequest;
                 problemDetails.Status = (int)HttpStatusCode.BadRequest;
-                problemDetails.Type = "https://httpstatuses.com/400";
                 break;
             default:
                 _logger.LogError(exception, "서버 에러 발생");
-                response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                problemDetails.Status = (int)HttpStatusCode.InternalServerError;
-                problemDetails.Type = "https://httpstatuses.com/500";
-                problemDetails.Detail = "Internal server error!";
                 break;
         }
 
-        var result = JsonSerializer.Serialize(problemDetails);
-        await context.Response.WriteAsync(result);
+        await context.Response.WriteAsJsonAsync(problemDetails);
     }
 }
