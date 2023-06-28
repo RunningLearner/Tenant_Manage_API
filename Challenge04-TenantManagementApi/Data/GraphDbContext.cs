@@ -14,8 +14,15 @@ public sealed class GraphDbContext : DbContext
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder
+    {
+        // DbContextOptionsBuilder를 통해 로그 레벨을 설정합니다.
+        optionsBuilder
+            .UseLoggerFactory(LoggerFactory.Create(builder
+                => builder.AddFilter((category, level) => level == LogLevel.Information)));
+
+        optionsBuilder
             .AddInterceptors(new SoftDeleteInterceptor());
+    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
