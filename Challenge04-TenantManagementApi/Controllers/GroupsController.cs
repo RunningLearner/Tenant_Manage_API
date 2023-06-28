@@ -10,13 +10,13 @@ namespace Challenge04_TenantManagementApi.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public sealed class GroupController : ControllerBase
+public sealed class GroupsController : ControllerBase
 {
     private readonly GroupService _service;
     private readonly IUrlHelper _urlHelper;
     private readonly IHttpContextAccessor _accessor;
 
-    public GroupController(GroupService service, IUrlHelper urlHelper, IHttpContextAccessor accessor)
+    public GroupsController(GroupService service, IUrlHelper urlHelper, IHttpContextAccessor accessor)
     {
         _service = service;
         _urlHelper = urlHelper;
