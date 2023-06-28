@@ -49,8 +49,8 @@ public sealed class GroupsController : ControllerBase
 
         if (nextCursor.HasValue)
         {
-            var localTime = nextCursor.Value.ToString("O");
-            var urlParams = new { PageSize, localTime };
+            var localizedTimeString = nextCursor.Value.ToString("O");
+            var urlParams = new { PageSize, localizedTimeString };
             response.NextUrl = _urlHelper.Link("GetAllGroups", urlParams);
         }
 

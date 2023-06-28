@@ -48,8 +48,8 @@ public sealed class UsersController : ControllerBase
 
         if (nextCursor != null)
         {
-            var localTime = nextCursor.Value.ToString("O");
-            var urlParams = new { PageSize, nextCursor = localTime };
+            var localizedTimeString = nextCursor.Value.ToString("O");
+            var urlParams = new { PageSize, nextCursor = localizedTimeString };
             response.NextUrl = _urlHelper.Link("GetAllUsers", urlParams);
         }
 
