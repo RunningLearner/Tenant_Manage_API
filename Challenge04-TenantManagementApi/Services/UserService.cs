@@ -121,8 +121,15 @@ public sealed class UserService
     /// <returns></returns>
     public async Task DeleteAsync(string id)
     {
-        var user = await _graphClient.Users[id].GetAsync();
-        await _graphClient.Users[id].DeleteAsync();
+        var user = await _graphDbContext.Users.FindAsync(id);
+
+        if (user is null)
+        {
+            throw new KeyNotFoundException($"ID '{id}'를 가진 유저를 찾지 못했습니다.");
+        }
+
+        _graphDbContext.Users.Remove(user);
+        await _graphDbContext.SaveChangesAsync();
         _logger.LogInformation("DeletedUser : {@DeletedUser}", user);
     }
 

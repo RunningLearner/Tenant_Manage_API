@@ -1,6 +1,6 @@
 namespace Challenge04_TenantManagementApi.Models;
 
-public class User
+public class User : ISoftDelete
 {
     public required string Id { get; set; }
 
@@ -11,4 +11,6 @@ public class User
     public string? MailNickname { get; set; }
 
     public required DateTimeOffset CreatedDateTime { get; set; }
+
+    public bool IsDeleted { get; set; }
 }

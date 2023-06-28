@@ -1,6 +1,6 @@
 namespace Challenge04_TenantManagementApi.Models;
 
-public class Group
+public class Group : ISoftDelete
 {
     public required string Id { get; set; }
 
@@ -11,4 +11,6 @@ public class Group
     public string? MailNickname { get; set; }
 
     public required DateTimeOffset CreatedDateTime { get; set; }
+
+    public bool IsDeleted { get; set; }
 }

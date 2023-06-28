@@ -13,9 +13,16 @@ public sealed class GraphDbContext : DbContext
     {
     }
 
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        => optionsBuilder
+            .AddInterceptors(new SoftDeleteInterceptor());
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<User>()
+            .HasQueryFilter(x => x.IsDeleted == false);
 
         modelBuilder.Entity<User>()
             .Property(e => e.CreatedDateTime)
@@ -24,5 +31,8 @@ public sealed class GraphDbContext : DbContext
         modelBuilder.Entity<Group>()
             .Property(e => e.CreatedDateTime)
             .HasConversion<long>();
+
+        modelBuilder.Entity<User>()
+            .HasQueryFilter(x => x.IsDeleted == false);
     }
 }

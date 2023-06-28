@@ -117,8 +117,15 @@ public sealed class GroupService
     /// <returns></returns>
     public async Task DeleteAsync(string id)
     {
-        var group = await _graphClient.Groups[id].GetAsync();
-        await _graphClient.Groups[id].DeleteAsync();
+        var group = await _graphDbContext.Groups.FindAsync(id);
+
+        if (group is null)
+        {
+            throw new KeyNotFoundException($"ID '{id}'를 가진 그룹을 찾지 못했습니다.");
+        }
+
+        _graphDbContext.Groups.Remove(group);
+        await _graphDbContext.SaveChangesAsync();
         _logger.LogInformation("DeletedGroup : {@DeletedGroup}", group);
     }
 
