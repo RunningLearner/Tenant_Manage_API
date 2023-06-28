@@ -36,7 +36,9 @@ public sealed class UserService
             query = query.Where(user => user.CreatedDateTime > cursor);
         }
 
-        var users = await query.OrderBy(user => user.CreatedDateTime).Take(pageSize + 1).ToListAsync();
+        var users = await query.OrderBy(user => user.CreatedDateTime)
+            .Take(pageSize + 1)
+                .ToListAsync();
 
         DateTimeOffset? nextCursor = null;
 
