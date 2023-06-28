@@ -29,17 +29,17 @@ public sealed class GraphDbContext : DbContext
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.Entity<User>()
-            .HasQueryFilter(x => x.IsDeleted == false);
+            .HasQueryFilter(user => user.IsDeleted == false);
 
         modelBuilder.Entity<User>()
-            .Property(e => e.CreatedDateTime)
+            .Property(user => user.CreatedDateTime)
             .HasConversion<long>();
 
         modelBuilder.Entity<Group>()
-            .Property(e => e.CreatedDateTime)
+            .Property(group => group.CreatedDateTime)
             .HasConversion<long>();
 
         modelBuilder.Entity<User>()
-            .HasQueryFilter(x => x.IsDeleted == false);
+            .HasQueryFilter(group => group.IsDeleted == false);
     }
 }
