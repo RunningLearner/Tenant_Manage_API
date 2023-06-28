@@ -10,12 +10,12 @@ namespace Challenge04_TenantManagementApi.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public sealed class UserController : ControllerBase
+public sealed class UsersController : ControllerBase
 {
     private readonly UserService _service;
     private readonly IUrlHelper _urlHelper;
     private readonly IHttpContextAccessor _accessor;
-    public UserController(UserService service, IUrlHelper urlHelper, IHttpContextAccessor accessor)
+    public UsersController(UserService service, IUrlHelper urlHelper, IHttpContextAccessor accessor)
     {
         _service = service;
         _urlHelper = urlHelper;
