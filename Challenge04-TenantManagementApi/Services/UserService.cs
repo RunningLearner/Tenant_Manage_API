@@ -42,7 +42,7 @@ public sealed class UserService
 
         if (users.Count > pageSize)
         {
-            nextCursor = users.Last().CreatedDateTime;
+            nextCursor = users[^2].CreatedDateTime;
             users.RemoveAt(users.Count - 1);
         }
 
