@@ -30,7 +30,7 @@ public sealed class UsersController : ControllerBase
     /// <response code="200">유저들의 정보 목록과 다음 시작점을 가리키는 URL</response>
     [HttpGet(Name = "GetAllUsers")]
     [ExecutionTime]
-    public async Task<ActionResult<PageResponse<User>>> GetAllUser([Range(10, 50)] int PageSize = 10)
+    public async Task<ActionResult<PageResponse<User>>> GetAllUser([Range(10, 50)] int pageSize = 10)
     {
         var context = _accessor.HttpContext;
         DateTimeOffset? cursor = null;
@@ -40,7 +40,7 @@ public sealed class UsersController : ControllerBase
             cursor = GetDateTimeStringFromUrl(context);
         }
 
-        var (users, nextCursor) = await _service.GetAllAsync(PageSize, cursor);
+        var (users, nextCursor) = await _service.GetAllAsync(pageSize, cursor);
         var response = new PageResponse<User>
         {
             Data = users
@@ -49,7 +49,7 @@ public sealed class UsersController : ControllerBase
         if (nextCursor != null)
         {
             var localizedTimeString = nextCursor.Value.ToString("O");
-            var urlParams = new { PageSize, nextCursor = localizedTimeString };
+            var urlParams = new { pageSize, nextCursor = localizedTimeString };
             response.NextUrl = _urlHelper.Link("GetAllUsers", urlParams);
         }
 

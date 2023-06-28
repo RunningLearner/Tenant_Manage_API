@@ -31,7 +31,7 @@ public sealed class GroupsController : ControllerBase
     /// <response code="200">그룹들의 정보 목록과 다음 시작점을 가리키는 URL</response>
     [HttpGet(Name = "GetAllGroups")]
     [ExecutionTime]
-    public async Task<ActionResult<PageResponse<Group>>> GetAllGroup(int PageSize)
+    public async Task<ActionResult<PageResponse<Group>>> GetAllGroup([Range(10, 50)] int pageSize = 10)
     {
         var context = _accessor.HttpContext;
         DateTimeOffset? cursor = null;
@@ -41,7 +41,7 @@ public sealed class GroupsController : ControllerBase
             cursor = GetDateTimeStringFromUrl(context);
         }
 
-        var (groups, nextCursor) = await _service.GetAllAsync(PageSize, cursor);
+        var (groups, nextCursor) = await _service.GetAllAsync(pageSize, cursor);
         var response = new PageResponse<Group>
         {
             Data = groups
@@ -50,7 +50,7 @@ public sealed class GroupsController : ControllerBase
         if (nextCursor.HasValue)
         {
             var localizedTimeString = nextCursor.Value.ToString("O");
-            var urlParams = new { PageSize, localizedTimeString };
+            var urlParams = new { pageSize, localizedTimeString };
             response.NextUrl = _urlHelper.Link("GetAllGroups", urlParams);
         }
 
