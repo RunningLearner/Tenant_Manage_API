@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http.Extensions;
 using Challenge04_TenantManagementApi.Services;
 using Challenge04_TenantManagementApi.Models;
 using Challenge04_TenantManagementApi.Attributes;
@@ -13,11 +14,13 @@ public sealed class GroupController : ControllerBase
 {
     private readonly GroupService _service;
     private readonly IUrlHelper _urlHelper;
+    private readonly IHttpContextAccessor _accessor;
 
-    public GroupController(GroupService service, IUrlHelper urlHelper)
+    public GroupController(GroupService service, IUrlHelper urlHelper, IHttpContextAccessor accessor)
     {
         _service = service;
         _urlHelper = urlHelper;
+        _accessor = accessor;
     }
 
     /// <summary>
@@ -28,16 +31,11 @@ public sealed class GroupController : ControllerBase
     /// <response code="200">그룹들의 정보 목록과 다음 시작점을 가리키는 URL</response>
     [HttpGet(Name = "GetAllGroups")]
     [ExecutionTime]
-    public async Task<ActionResult<PageResponse<Group>>> GetAllGroup([FromQuery] GetAllDto getAllDto)
+    public async Task<ActionResult<PageResponse<Group>>> GetAllGroup(int PageSize)
     {
-        DateTimeOffset? cursor = null;
+        DateTimeOffset? cursor = GetDateTimeStringFromUrl();
 
-        if (!string.IsNullOrEmpty(getAllDto.NextUrl))
-        {
-            cursor = GetDateTimeStringFromUrl(getAllDto.NextUrl);
-        }
-
-        var (groups, nextCursor) = await _service.GetAllAsync(getAllDto.PageSize, cursor);
+        var (groups, nextCursor) = await _service.GetAllAsync(PageSize, cursor);
         var response = new PageResponse<Group>
         {
             Data = groups
@@ -45,7 +43,7 @@ public sealed class GroupController : ControllerBase
 
         if (nextCursor != null)
         {
-            var urlParams = new { getAllDto.PageSize, cursor = nextCursor };
+            var urlParams = new { PageSize, nextCursor };
             response.NextUrl = _urlHelper.Link("GetAllGroups", urlParams);
         }
 
@@ -111,11 +109,16 @@ public sealed class GroupController : ControllerBase
         return NoContent();
     }
 
-    private static DateTimeOffset GetDateTimeStringFromUrl(string NextUrl)
+    private DateTimeOffset? GetDateTimeStringFromUrl()
     {
-        var uri = new Uri(NextUrl);
+        var uri = new Uri(_accessor?.HttpContext?.Request.GetDisplayUrl());
         var queryParameters = HttpUtility.ParseQueryString(uri.Query);
-        var cursor = queryParameters.Get("cursor");
+        var cursor = queryParameters.Get("nextCursor");
+
+        if (cursor == null)
+        {
+            return null;
+        }
 
         if (!DateTimeOffset.TryParse(cursor, out DateTimeOffset parsed))
         {

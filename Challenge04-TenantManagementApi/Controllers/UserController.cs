@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http.Extensions;
 using Challenge04_TenantManagementApi.Services;
 using Challenge04_TenantManagementApi.Models;
 using Challenge04_TenantManagementApi.Attributes;
@@ -13,11 +14,12 @@ public sealed class UserController : ControllerBase
 {
     private readonly UserService _service;
     private readonly IUrlHelper _urlHelper;
-
-    public UserController(UserService service, IUrlHelper urlHelper)
+    private readonly IHttpContextAccessor _accessor;
+    public UserController(UserService service, IUrlHelper urlHelper, IHttpContextAccessor accessor)
     {
         _service = service;
         _urlHelper = urlHelper;
+        _accessor = accessor;
     }
 
     /// <summary>
@@ -28,16 +30,11 @@ public sealed class UserController : ControllerBase
     /// <response code="200">유저들의 정보 목록과 다음 시작점을 가리키는 URL</response>
     [HttpGet(Name = "GetAllUsers")]
     [ExecutionTime]
-    public async Task<ActionResult<PageResponse<User>>> GetAllUser([FromQuery] GetAllDto getAllDto)
+    public async Task<ActionResult<PageResponse<User>>> GetAllUser([Range(10, 50)] int PageSize = 10)
     {
-        DateTimeOffset? cursor = null;
+        DateTimeOffset? cursor = GetDateTimeStringFromUrl();
 
-        if (!string.IsNullOrEmpty(getAllDto.NextUrl))
-        {
-            cursor = GetDateTimeStringFromUrl(getAllDto.NextUrl);
-        }
-
-        var (users, nextCursor) = await _service.GetAllAsync(getAllDto.PageSize, cursor);
+        var (users, nextCursor) = await _service.GetAllAsync(PageSize, cursor);
         var response = new PageResponse<User>
         {
             Data = users
@@ -45,7 +42,7 @@ public sealed class UserController : ControllerBase
 
         if (nextCursor != null)
         {
-            var urlParams = new { getAllDto.PageSize, cursor = nextCursor };
+            var urlParams = new { PageSize, nextCursor };
             response.NextUrl = _urlHelper.Link("GetAllUsers", urlParams);
         }
 
@@ -111,11 +108,16 @@ public sealed class UserController : ControllerBase
         return NoContent();
     }
 
-    private static DateTimeOffset GetDateTimeStringFromUrl(string NextUrl)
+    private DateTimeOffset? GetDateTimeStringFromUrl()
     {
-        var uri = new Uri(NextUrl);
+        var uri = new Uri(_accessor?.HttpContext?.Request.GetDisplayUrl());
         var queryParameters = HttpUtility.ParseQueryString(uri.Query);
-        var cursor = queryParameters.Get("cursor");
+        var cursor = queryParameters.Get("nextCursor");
+
+        if (cursor == null)
+        {
+            return null;
+        }
 
         if (!DateTimeOffset.TryParse(cursor, out DateTimeOffset parsed))
         {
