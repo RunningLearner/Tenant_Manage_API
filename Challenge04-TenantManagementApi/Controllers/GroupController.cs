@@ -33,7 +33,13 @@ public sealed class GroupController : ControllerBase
     [ExecutionTime]
     public async Task<ActionResult<PageResponse<Group>>> GetAllGroup(int PageSize)
     {
-        DateTimeOffset? cursor = GetDateTimeStringFromUrl();
+        var context = _accessor.HttpContext;
+        DateTimeOffset? cursor = null;
+
+        if (context is not null)
+        {
+            cursor = GetDateTimeStringFromUrl(context);
+        }
 
         var (groups, nextCursor) = await _service.GetAllAsync(PageSize, cursor);
         var response = new PageResponse<Group>
@@ -41,9 +47,10 @@ public sealed class GroupController : ControllerBase
             Data = groups
         };
 
-        if (nextCursor != null)
+        if (nextCursor.HasValue)
         {
-            var urlParams = new { PageSize, nextCursor };
+            var localTime = nextCursor.Value.ToString("O");
+            var urlParams = new { PageSize, localTime };
             response.NextUrl = _urlHelper.Link("GetAllGroups", urlParams);
         }
 
@@ -109,9 +116,9 @@ public sealed class GroupController : ControllerBase
         return NoContent();
     }
 
-    private DateTimeOffset? GetDateTimeStringFromUrl()
+    private static DateTimeOffset? GetDateTimeStringFromUrl(HttpContext context)
     {
-        var uri = new Uri(_accessor?.HttpContext?.Request.GetDisplayUrl());
+        var uri = new Uri(context.Request.GetDisplayUrl());
         var queryParameters = HttpUtility.ParseQueryString(uri.Query);
         var cursor = queryParameters.Get("nextCursor");
 

@@ -32,7 +32,13 @@ public sealed class UserController : ControllerBase
     [ExecutionTime]
     public async Task<ActionResult<PageResponse<User>>> GetAllUser([Range(10, 50)] int PageSize = 10)
     {
-        DateTimeOffset? cursor = GetDateTimeStringFromUrl();
+        var context = _accessor.HttpContext;
+        DateTimeOffset? cursor = null;
+
+        if (context is not null)
+        {
+            cursor = GetDateTimeStringFromUrl(context);
+        }
 
         var (users, nextCursor) = await _service.GetAllAsync(PageSize, cursor);
         var response = new PageResponse<User>
@@ -42,7 +48,8 @@ public sealed class UserController : ControllerBase
 
         if (nextCursor != null)
         {
-            var urlParams = new { PageSize, nextCursor };
+            var localTime = nextCursor.Value.ToString("O");
+            var urlParams = new { PageSize, nextCursor = localTime };
             response.NextUrl = _urlHelper.Link("GetAllUsers", urlParams);
         }
 
@@ -108,9 +115,9 @@ public sealed class UserController : ControllerBase
         return NoContent();
     }
 
-    private DateTimeOffset? GetDateTimeStringFromUrl()
+    private static DateTimeOffset? GetDateTimeStringFromUrl(HttpContext context)
     {
-        var uri = new Uri(_accessor?.HttpContext?.Request.GetDisplayUrl());
+        var uri = new Uri(context.Request.GetDisplayUrl());
         var queryParameters = HttpUtility.ParseQueryString(uri.Query);
         var cursor = queryParameters.Get("nextCursor");
 
