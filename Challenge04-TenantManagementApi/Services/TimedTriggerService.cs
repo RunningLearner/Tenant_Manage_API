@@ -18,7 +18,7 @@ public sealed class TimedTriggerService : BackgroundService
 
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation("데이터를 반복적으로 가져오기 시작합니다.");
+        _logger.LogInformation("데이터 가져오기 시작");
 
         _timer = new Timer(TimeSpan.FromMinutes(5).TotalMilliseconds); // 5 minutes
         _timer.Elapsed += async (sender, e) => await ProcessData();
@@ -31,7 +31,7 @@ public sealed class TimedTriggerService : BackgroundService
     {
         if (_isProcessing)
         {
-            _logger.LogInformation("데이터를 가져오는 작업이 완료되지 않았습니다.");
+            _logger.LogInformation("작업 중복에 의한 건너뛰기");
             return;
         }
 
@@ -39,7 +39,7 @@ public sealed class TimedTriggerService : BackgroundService
 
         try
         {
-            _logger.LogInformation("데이터를 가져오는 중입니다.");
+            _logger.LogInformation("데이터를 가져오는 중");
 
             using (var scope = _serviceScopeFactory.CreateScope())
             {
@@ -50,11 +50,11 @@ public sealed class TimedTriggerService : BackgroundService
                 await dataFetchingService.FetchGroupData(dbContext);
             }
 
-            _logger.LogInformation("데이터를 가져왔습니다.");
+            _logger.LogInformation("데이터 가져오기 완료");
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "데이터를 Graph api에서 가져오는데 문제가 발생했습니다.");
+            _logger.LogError(ex, "Graph api에서 데이터 가져오기 실패");
         }
         finally
         {
