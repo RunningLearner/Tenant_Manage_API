@@ -2,7 +2,7 @@ using Challenge04_TenantManagementApi.Data;
 using Challenge04_TenantManagementApi.Models;
 using Microsoft.Graph;
 using Microsoft.Graph.Models;
-using GrpahUser = Microsoft.Graph.Models.User;
+using GraphUser = Microsoft.Graph.Models.User;
 using DbUser = Challenge04_TenantManagementApi.Models.User;
 using Microsoft.EntityFrameworkCore;
 
@@ -78,7 +78,7 @@ public sealed class UserService
     /// <returns>생성된 유저의 정보</returns>
     public async Task<UserDto> AddAsync(CreateUserDto createUserDto)
     {
-        var user = new GrpahUser
+        var user = new GraphUser
         {
             AccountEnabled = true,
             DisplayName = createUserDto.DisplayName,
@@ -105,7 +105,7 @@ public sealed class UserService
     /// <returns></returns>
     public async Task UpdateAsync(string id, UserDto userDto)
     {
-        var user = new GrpahUser
+        var user = new GraphUser
         {
             DisplayName = userDto.DisplayName,
             MailNickname = userDto.MailNickname,
@@ -135,7 +135,7 @@ public sealed class UserService
         _logger.LogInformation("DeletedUser : {@DeletedUser}", user);
     }
 
-    private static UserDto ItemToDto(GrpahUser user)
+    private static UserDto ItemToDto(GraphUser user)
     {
         return new UserDto
         {
