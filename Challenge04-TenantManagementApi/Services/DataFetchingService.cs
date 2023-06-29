@@ -34,7 +34,7 @@ public sealed class DataFetchingService
         {
             requestConfiguration.QueryParameters.Select = new[] { "id", "displayName", "userPrincipalName", "mailNickname", "createdDateTime" };
             requestConfiguration.Options.Add(retryHandlerOption);
-        }) ?? throw new ServiceException("Graph 클라이언트가 응답하지 않습니다.");
+        }) ?? throw new ServiceException("GraphClient가 응답하지 않습니다.");
 
         var pageIterator = PageIterator<GraphUser, UserCollectionResponse>
             .CreatePageIterator(_graphClient, usersResponse, async (user) =>
@@ -84,7 +84,7 @@ public sealed class DataFetchingService
         {
             requestConfiguration.QueryParameters.Select = new[] { "id", "displayName", "description", "mailNickname", "createdDateTime" };
             requestConfiguration.Options.Add(retryHandlerOption);
-        }) ?? throw new ServiceException("Graph 클라이언트가 응답하지 않습니다.");
+        }) ?? throw new ServiceException("GraphClient가 응답하지 않습니다.");
 
         var pageIterator = PageIterator<GraphGroup, GroupCollectionResponse>
         .CreatePageIterator(_graphClient, groupsResponse, async (group) =>
