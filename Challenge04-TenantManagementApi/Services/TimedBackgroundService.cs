@@ -3,27 +3,27 @@ using Timer = System.Timers.Timer;
 
 namespace Challenge04_TenantManagementApi.Services;
 
-public sealed class TimedBackgroundService : BackgroundService
+public sealed class TimedBackgroundService : IHostedService, IDisposable
 {
+    private const string ClassName = nameof(TimedBackgroundService);
     private readonly ILogger<TimedBackgroundService> _logger;
     private readonly IServiceScopeFactory _serviceScopeFactory;
-    private Timer? _timer;
+    private readonly Timer _timer;
     private bool _isProcessing;
 
     public TimedBackgroundService(ILogger<TimedBackgroundService> logger, IServiceScopeFactory serviceScopeFactory)
     {
         _logger = logger;
         _serviceScopeFactory = serviceScopeFactory;
+        _timer = new Timer(TimeSpan.FromMinutes(5).TotalMilliseconds);
+        _timer.Elapsed += async (sender, e) => await ProcessData();
     }
 
-    protected override Task ExecuteAsync(CancellationToken stoppingToken)
+    public Task StartAsync(CancellationToken cancellationToken)
     {
-        _logger.LogInformation("반복작업 개시");
-
-        _timer = new Timer(TimeSpan.FromMinutes(5).TotalMilliseconds); // 5 minutes
-        _timer.Elapsed += async (sender, e) => await ProcessData();
+        _logger.LogInformation("[{ClassName}] 서비스 시작", ClassName);
         _timer.Start();
-
+        Task.Run(ProcessData, cancellationToken); // 처음에 바로 동작하도록 
         return Task.CompletedTask;
     }
 
@@ -53,12 +53,18 @@ public sealed class TimedBackgroundService : BackgroundService
         _isProcessing = false;
     }
 
+    public Task StopAsync(CancellationToken cancellationToken)
+    {
+        _logger.LogInformation("[{ClassName}] 서비스 종료", ClassName);
+        _timer.Close();
+        return Task.CompletedTask;
+    }
+
     /// <summary>
     /// 메모리 릭을 방지하는 메서드
     /// </summary>
-    public override void Dispose()
+    public void Dispose()
     {
-        _timer?.Dispose();
-        base.Dispose();
+        _timer.Dispose();
     }
 }
