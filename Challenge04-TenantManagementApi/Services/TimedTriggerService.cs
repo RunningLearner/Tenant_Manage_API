@@ -18,7 +18,7 @@ public sealed class TimedTriggerService : BackgroundService
 
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation("데이터 가져오기 시작");
+        _logger.LogInformation("반복작업 개시");
 
         _timer = new Timer(TimeSpan.FromMinutes(5).TotalMilliseconds); // 5 minutes
         _timer.Elapsed += async (sender, e) => await ProcessData();
@@ -37,24 +37,19 @@ public sealed class TimedTriggerService : BackgroundService
 
         _isProcessing = true;
 
-        try
+        _logger.LogInformation("데이터를 가져오는 중");
+
+        using (var scope = _serviceScopeFactory.CreateScope())
         {
-            _logger.LogInformation("데이터를 가져오는 중");
+            var dbContext = scope.ServiceProvider.GetRequiredService<GraphDbContext>();
+            var dataFetchingService = scope.ServiceProvider.GetRequiredService<DataFetchingService>();
 
-            using (var scope = _serviceScopeFactory.CreateScope())
-            {
-                var dbContext = scope.ServiceProvider.GetRequiredService<GraphDbContext>();
-                var dataFetchingService = scope.ServiceProvider.GetRequiredService<DataFetchingService>();
-
-                await dataFetchingService.FetchUserData(dbContext);
-                await dataFetchingService.FetchGroupData(dbContext);
-            }
-
-            _logger.LogInformation("데이터 가져오기 완료");
+            await dataFetchingService.FetchUserData(dbContext);
+            await dataFetchingService.FetchGroupData(dbContext);
         }
-        finally
-        {
-            _isProcessing = false;
-        }
+
+        _logger.LogInformation("데이터 가져오기 완료");
+
+        _isProcessing = false;
     }
 }
