@@ -7,9 +7,6 @@
 ## 실행방법
 
 ```
-// 먼저 DB를 초기화 시킵니다.
-dotnet ef database update
-
 // 어플리케이션을 실행합니다.
 dotnet run
 ```
