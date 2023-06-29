@@ -52,10 +52,6 @@ public sealed class TimedTriggerService : BackgroundService
 
             _logger.LogInformation("데이터 가져오기 완료");
         }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Graph api에서 데이터 가져오기 실패");
-        }
         finally
         {
             _isProcessing = false;
