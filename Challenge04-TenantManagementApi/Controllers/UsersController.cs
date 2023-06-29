@@ -23,9 +23,11 @@ public sealed class UsersController : ControllerBase
     }
 
     /// <summary>
-    /// GET: api/User
     /// 유저들의 정보를 요청받은 수량만큼 조회
     /// </summary>
+    /// <example>
+    /// GET: api/Users
+    /// </example>
     /// <param name="pageSize">한 번에 조회할 단위(10~50)</param>
     /// <response code="200">유저들의 정보 목록과 다음 시작점을 가리키는 URL</response>
     [HttpGet(Name = "GetAllUsers")]
@@ -57,9 +59,11 @@ public sealed class UsersController : ControllerBase
     }
 
     /// <summary>
-    /// GET: api/User/5
     /// 특정 유저의 정보를 조회
     /// </summary>
+    /// <example>
+    /// GET: api/Users/5
+    /// </example>
     /// <param name="id">조회할 유저의 ID</param>
     /// <response code="200">특정 유저의 조회에 성공할 경우</response>
     [HttpGet("{id}")]
@@ -70,9 +74,11 @@ public sealed class UsersController : ControllerBase
     }
 
     /// <summary>
-    /// POST: api/User
     /// 새로운 유저를 생성
     /// </summary>
+    /// <example>
+    /// POST: api/Users
+    /// </example>
     /// <param name="userDto">생성할 유저의 정보</param>
     /// <response code="201">생성에 성공할 경우</response>
     [HttpPost]
@@ -85,9 +91,11 @@ public sealed class UsersController : ControllerBase
     }
 
     /// <summary>
-    /// PUT: api/User/5
     /// 유저의 정보를 수정
     /// </summary>
+    /// <example>
+    /// PUT: api/Users/5
+    /// </example>
     /// <param name="id">수정할 유저의 ID</param>
     /// <param name="userDto">수정할 정보</param>
     /// <response code="204">수정이 성공할 경우</response>
@@ -101,9 +109,11 @@ public sealed class UsersController : ControllerBase
     }
 
     /// <summary>
-    /// DELETE: api/User/5
     /// 특정 유저를 삭제
     /// </summary>
+    /// <example>
+    /// DELETE: api/Users/5
+    /// </example>
     /// <param name="id">삭제할 유저의 ID</param>
     /// <response code="204">삭제가 성공할 경우</response>
     [HttpDelete("{id}")]

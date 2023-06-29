@@ -24,9 +24,11 @@ public sealed class GroupsController : ControllerBase
     }
 
     /// <summary>
-    /// GET: api/User
     /// 그룹들의 정보를 요청받은 수량만큼 조회
     /// </summary>
+    /// <example>
+    /// GET: api/Groups
+    /// </example>
     /// <param name="pageSize">한 번에 조회할 단위(10~50)</param>
     /// <response code="200">그룹들의 정보 목록과 다음 시작점을 가리키는 URL</response>
     [HttpGet(Name = "GetAllGroups")]
@@ -58,9 +60,11 @@ public sealed class GroupsController : ControllerBase
     }
 
     /// <summary>
-    /// GET: api/Group/5
     /// 특정 유저의 정보를 조회
     /// </summary>
+    /// <example>
+    /// GET: api/Groups/5
+    /// </example>
     /// <param name="id">조회할 그룹의 ID</param>
     /// <response code="200">특정 그룹의 조회에 성공할 경우</response>
     [HttpGet("{id}")]
@@ -71,9 +75,11 @@ public sealed class GroupsController : ControllerBase
     }
 
     /// <summary>
-    /// POST: api/Group
     /// 새로운 그룹을 생성
     /// </summary>
+    /// <example>
+    /// POST: api/Groups
+    /// </example>
     /// <param name="groupDto">생성할 그룹의 정보</param>
     /// <response code="201">생성에 성공할 경우</response>
     [HttpPost]
@@ -86,9 +92,11 @@ public sealed class GroupsController : ControllerBase
     }
 
     /// <summary>
-    /// PUT: api/Group/5
     /// 특정 그룹의 정보를 수정
     /// </summary>
+    /// <example>
+    /// PUT: api/Groups/5
+    /// </example>
     /// <param name="id">수정할 그룹의 ID</param>
     /// <param name="groupDto">수정에 사용될 정보</param>
     /// <response code="204">수정에 성공할 경우</response>
@@ -102,9 +110,11 @@ public sealed class GroupsController : ControllerBase
     }
 
     /// <summary>
-    /// DELETE: api/Group/5
     /// 특정 그룹을 삭제
     /// </summary>
+    /// <example>
+    /// DELETE: api/Groups/5
+    /// </example>
     /// <param name="id">삭제할 그룹의 ID</param>
     /// <response code="204">삭제에 성공할 경우</response>
     [HttpDelete("{id}")]
