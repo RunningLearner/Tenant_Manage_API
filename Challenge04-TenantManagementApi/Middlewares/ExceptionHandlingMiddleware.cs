@@ -33,14 +33,12 @@ public class ExceptionHandlingMiddleware : IMiddleware
 
     private async Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
-        context.Response.ContentType = "application/json";
-
         var response = context.Response;
-        response.StatusCode = (int)HttpStatusCode.InternalServerError;
+        response.ContentType = "application/json";
 
         var problemDetails = new ProblemDetails
         {
-            Instance = context.Request?.Path,
+            Instance = context.Request.Path,
             Title = exception.GetType().Name,
             Detail = exception.Message,
             Status = (int)HttpStatusCode.InternalServerError,
@@ -49,20 +47,16 @@ public class ExceptionHandlingMiddleware : IMiddleware
         switch (exception)
         {
             case ODataError ex:
-                response.StatusCode = ex.ResponseStatusCode;
                 problemDetails.Status = ex.ResponseStatusCode;
                 break;
             case UnauthorizedAccessException:
-                response.StatusCode = (int)HttpStatusCode.Unauthorized;
                 problemDetails.Status = (int)HttpStatusCode.Unauthorized;
                 break;
             case KeyNotFoundException:
             case ArgumentNullException:
-                response.StatusCode = (int)HttpStatusCode.NotFound;
                 problemDetails.Status = (int)HttpStatusCode.NotFound;
                 break;
             case ArgumentException:
-                response.StatusCode = (int)HttpStatusCode.BadRequest;
                 problemDetails.Status = (int)HttpStatusCode.BadRequest;
                 break;
             default:
@@ -70,6 +64,7 @@ public class ExceptionHandlingMiddleware : IMiddleware
                 break;
         }
 
+        response.StatusCode = (int)problemDetails.Status;
         await context.Response.WriteAsJsonAsync(problemDetails);
     }
 }
