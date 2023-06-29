@@ -159,7 +159,7 @@ public class Startup
             app.UseDeveloperExceptionPage();
             app.UseSwagger();
             app.UseSwaggerUI();
-            EnsureDatabaseUpdated((WebApplication)app);
+            EnsureDatabaseUpdated(app.ApplicationServices);
         }
 
         app.UseHttpsRedirection();
@@ -177,9 +177,9 @@ public class Startup
         });
     }
 
-    private static void EnsureDatabaseUpdated(WebApplication app)
+    private static void EnsureDatabaseUpdated(IServiceProvider serviceProvider)
     {
-        using var scope = app.Services.CreateScope();
+        using var scope = serviceProvider.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<GraphDbContext>();
         // 애플리케이션 시작 시 데이터베이스에 대해 보류 중인 마이그레이션을 적용
         context.Database.Migrate();

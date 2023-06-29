@@ -42,8 +42,8 @@ public sealed class DataFetchingService
             }) ?? throw new ServiceException("GraphClient가 응답하지 않습니다.");
 
             var pageIterator = GetUserPageIterator(dbContext, usersResponse);
-
             await pageIterator.IterateAsync();
+            await dbContext.SaveChangesAsync();
         }
         catch (Exception ex)
         {
@@ -72,8 +72,8 @@ public sealed class DataFetchingService
             }) ?? throw new ServiceException("GraphClient가 응답하지 않습니다.");
 
             var pageIterator = GetGroupPageIterator(dbContext, groupsResponse);
-
             await pageIterator.IterateAsync();
+            await dbContext.SaveChangesAsync();
         }
         catch (Exception ex)
         {
@@ -108,7 +108,6 @@ public sealed class DataFetchingService
                     dbContext.Groups.Update(dbGroup);
                 }
 
-                await dbContext.SaveChangesAsync();
                 return true;
             });
     }
@@ -140,7 +139,6 @@ public sealed class DataFetchingService
                     dbContext.Users.Update(dbUser);
                 }
 
-                await dbContext.SaveChangesAsync();
                 return true;
             });
     }
