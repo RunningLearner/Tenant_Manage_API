@@ -104,8 +104,8 @@ public class Startup
         services.AddSingleton(graphServiceClient);
 
         // 주기적으로 작동하는 data fetcher 등록
-        services.AddHostedService<TimedDataFetchingService>();
-
+        services.AddHostedService<TimedTriggerService>();
+        services.AddScoped<DataFetchingService>();
         services.AddScoped<UserService>();
         services.AddScoped<GroupService>();
     }

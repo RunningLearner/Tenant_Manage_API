@@ -9,48 +9,16 @@ using Microsoft.Kiota.Http.HttpClientLibrary.Middleware.Options;
 
 namespace Challenge04_TenantManagementApi.Services;
 
-public sealed class TimedDataFetchingService : BackgroundService
+public sealed class DataFetchingService
 {
-    private readonly ILogger<TimedDataFetchingService> _logger;
-    private readonly IServiceScopeFactory _serviceScopeFactory;
     private readonly GraphServiceClient _graphClient;
 
-    public TimedDataFetchingService(ILogger<TimedDataFetchingService> logger, IServiceScopeFactory serviceScopeFactory, GraphServiceClient graphClient)
+    public DataFetchingService(GraphServiceClient graphClient)
     {
-        _logger = logger;
-        _serviceScopeFactory = serviceScopeFactory;
         _graphClient = graphClient;
     }
 
-    /// <summary>
-    /// 앱이 실행되는 동안 유저와 그룹의 정보를 받아와 DB에 저장합니다.
-    /// </summary>
-    /// <param name="stoppingToken">작업을 중단시킬 수 있는 토큰</param>
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-    {
-        _logger.LogInformation("Timed Data Fetching Service is starting.");
-
-        while (!stoppingToken.IsCancellationRequested)
-        {
-            _logger.LogInformation("Timed Data Fetching Service is working.");
-
-            using (var scope = _serviceScopeFactory.CreateScope())
-            {
-                var dbContext = scope.ServiceProvider.GetRequiredService<GraphDbContext>();
-
-                // Use dbContext to interact with the database here
-                await FetchUserData(dbContext);
-                await FetchGroupData(dbContext);
-
-            }
-
-            await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken);
-        }
-
-        _logger.LogInformation("Timed Data Fetching Service is stopping.");
-    }
-
-    private async Task FetchUserData(GraphDbContext dbContext)
+    public async Task FetchUserData(GraphDbContext dbContext)
     {
         var retryHandlerOption = new RetryHandlerOption
         {
@@ -95,7 +63,7 @@ public sealed class TimedDataFetchingService : BackgroundService
         await pageIterator.IterateAsync();
     }
 
-    private async Task FetchGroupData(GraphDbContext dbContext)
+    public async Task FetchGroupData(GraphDbContext dbContext)
     {
         var retryHandlerOption = new RetryHandlerOption
         {
