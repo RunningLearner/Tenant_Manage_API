@@ -38,10 +38,10 @@ public sealed class GraphDbContext : DbContext
             .HasConversion<long>();
 
         modelBuilder.Entity<Group>()
+            .HasQueryFilter(group => group.IsDeleted == false);
+
+        modelBuilder.Entity<Group>()
             .Property(group => group.CreatedDateTime)
             .HasConversion<long>();
-
-        modelBuilder.Entity<User>()
-            .HasQueryFilter(group => group.IsDeleted == false);
     }
 }
