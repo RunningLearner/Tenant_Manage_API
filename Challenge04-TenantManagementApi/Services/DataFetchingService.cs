@@ -43,7 +43,7 @@ public sealed class DataFetchingService
 
                 if (dbUser == null)
                 {
-                    var res = dbContext.Users.Add(new DbUser
+                    dbContext.Users.Add(new DbUser
                     {
                         Id = user.Id!,
                         DisplayName = user.DisplayName,
