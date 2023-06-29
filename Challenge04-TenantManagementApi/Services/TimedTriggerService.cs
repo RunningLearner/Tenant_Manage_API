@@ -52,4 +52,13 @@ public sealed class TimedTriggerService : BackgroundService
 
         _isProcessing = false;
     }
+
+    /// <summary>
+    /// 메모리 릭을 방지하는 메서드
+    /// </summary>
+    public override void Dispose()
+    {
+        _timer?.Dispose();
+        base.Dispose();
+    }
 }
