@@ -3,14 +3,14 @@ using Timer = System.Timers.Timer;
 
 namespace Challenge04_TenantManagementApi.Services;
 
-public sealed class TimedTriggerService : BackgroundService
+public sealed class TimedBackgroundService : BackgroundService
 {
-    private readonly ILogger<TimedTriggerService> _logger;
+    private readonly ILogger<TimedBackgroundService> _logger;
     private readonly IServiceScopeFactory _serviceScopeFactory;
     private Timer? _timer;
     private bool _isProcessing;
 
-    public TimedTriggerService(ILogger<TimedTriggerService> logger, IServiceScopeFactory serviceScopeFactory)
+    public TimedBackgroundService(ILogger<TimedBackgroundService> logger, IServiceScopeFactory serviceScopeFactory)
     {
         _logger = logger;
         _serviceScopeFactory = serviceScopeFactory;
