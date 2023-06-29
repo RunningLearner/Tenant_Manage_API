@@ -18,6 +18,11 @@ public sealed class DataFetchingService
         _graphClient = graphClient;
     }
 
+    /// <summary>
+    /// Graph 클라이언트에서 유저들의 데이터를 가져와 db에 저장
+    /// </summary>
+    /// <param name="dbContext">현재 DB의 컨텍스트</param>
+    /// <exception cref="ArgumentNullException"></exception>
     public async Task FetchUserData(GraphDbContext dbContext)
     {
         var retryHandlerOption = new RetryHandlerOption
@@ -63,6 +68,11 @@ public sealed class DataFetchingService
         await pageIterator.IterateAsync();
     }
 
+    /// <summary>
+    /// Graph 클라이언트에서 그룹들의 데이터를 가져와 db에 저장
+    /// </summary>
+    /// <param name="dbContext">현재 DB의 컨텍스트</param>
+    /// <exception cref="ArgumentNullException"></exception>
     public async Task FetchGroupData(GraphDbContext dbContext)
     {
         var retryHandlerOption = new RetryHandlerOption

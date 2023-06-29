@@ -26,7 +26,7 @@ public sealed class UsersController : ControllerBase
     /// GET: api/User
     /// 유저들의 정보를 요청받은 수량만큼 조회
     /// </summary>
-    /// <param name="getAllDto">조회 수량과 조회 시작점을 가리키는 URL</param>
+    /// <param name="pageSize">한 번에 조회할 단위(10~50)</param>
     /// <response code="200">유저들의 정보 목록과 다음 시작점을 가리키는 URL</response>
     [HttpGet(Name = "GetAllUsers")]
     [ExecutionTime]
