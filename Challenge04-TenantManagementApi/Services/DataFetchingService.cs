@@ -77,7 +77,7 @@ public sealed class DataFetchingService
     {
         var retryHandlerOption = new RetryHandlerOption
         {
-            MaxRetry = 7,
+            MaxRetry = 5,
         };
 
         var groupsResponse = await _graphClient.Groups.GetAsync(requestConfiguration =>
