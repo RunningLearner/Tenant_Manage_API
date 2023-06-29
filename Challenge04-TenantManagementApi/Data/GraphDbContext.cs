@@ -11,6 +11,8 @@ public sealed class GraphDbContext : DbContext
     public GraphDbContext(DbContextOptions<GraphDbContext> options)
         : base(options)
     {
+        // DB가 없으면 만듭니다.
+        Database.EnsureCreated();
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
