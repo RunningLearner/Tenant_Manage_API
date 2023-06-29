@@ -12,6 +12,7 @@ namespace Challenge04_TenantManagementApi.Services;
 public sealed class DataFetchingService
 {
     private readonly GraphServiceClient _graphClient;
+    private const int RetryCount = 5;
 
     public DataFetchingService(GraphServiceClient graphClient)
     {
@@ -27,7 +28,7 @@ public sealed class DataFetchingService
     {
         var retryHandlerOption = new RetryHandlerOption
         {
-            MaxRetry = 5,
+            MaxRetry = RetryCount,
         };
 
         var usersResponse = await _graphClient.Users.GetAsync(requestConfiguration =>
@@ -77,7 +78,7 @@ public sealed class DataFetchingService
     {
         var retryHandlerOption = new RetryHandlerOption
         {
-            MaxRetry = 5,
+            MaxRetry = RetryCount,
         };
 
         var groupsResponse = await _graphClient.Groups.GetAsync(requestConfiguration =>
