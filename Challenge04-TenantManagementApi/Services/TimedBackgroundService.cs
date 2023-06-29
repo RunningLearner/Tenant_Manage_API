@@ -44,8 +44,7 @@ public sealed class TimedBackgroundService : IHostedService, IDisposable
             var dbContext = scope.ServiceProvider.GetRequiredService<GraphDbContext>();
             var dataFetchingService = scope.ServiceProvider.GetRequiredService<DataFetchingService>();
 
-            await dataFetchingService.FetchUserData(dbContext);
-            await dataFetchingService.FetchGroupData(dbContext);
+            await dataFetchingService.FetchData(dbContext);
         }
 
         _logger.LogInformation("데이터 가져오기 완료");

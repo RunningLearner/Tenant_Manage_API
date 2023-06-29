@@ -22,124 +22,152 @@ public sealed class DataFetchingService
     }
 
     /// <summary>
-    /// Graph 클라이언트에서 유저들의 데이터를 가져와 db에 저장
+    /// 그룹과 유저의 데이터를 graph에서 가져와 db에 저장
     /// </summary>
-    /// <param name="dbContext">현재 DB의 컨텍스트</param>
-    /// <exception cref="ArgumentNullException"></exception>
-    public async Task FetchUserData(GraphDbContext dbContext)
+    /// <param name="dbContext"></param>
+    public async Task FetchData(GraphDbContext dbContext)
     {
         try
         {
-            var retryHandlerOption = new RetryHandlerOption
-            {
-                MaxRetry = RetryCount,
-            };
-
-            var usersResponse = await _graphClient.Users.GetAsync(requestConfiguration =>
-            {
-                requestConfiguration.QueryParameters.Select = new[] { "id", "displayName", "userPrincipalName", "mailNickname", "createdDateTime" };
-                requestConfiguration.Options.Add(retryHandlerOption);
-            }) ?? throw new ServiceException("GraphClient가 응답하지 않습니다.");
-
-            var pageIterator = GetUserPageIterator(dbContext, usersResponse);
-            await pageIterator.IterateAsync();
+            await FetchUserData(dbContext);
+            await FetchGroupData(dbContext);
             await dbContext.SaveChangesAsync();
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "유저 데이터를 가져오는 중 에러 발생");
+            _logger.LogError(ex, "데이터를 가져오는 중 에러 발생");
         }
     }
 
-    /// <summary>
-    /// Graph 클라이언트에서 그룹들의 데이터를 가져와 db에 저장
-    /// </summary>
-    /// <param name="dbContext">현재 DB의 컨텍스트</param>
-    /// <exception cref="ArgumentNullException"></exception>
-    public async Task FetchGroupData(GraphDbContext dbContext)
+    private async Task FetchUserData(GraphDbContext dbContext)
     {
-        try
+        var retryHandlerOption = new RetryHandlerOption
         {
-            var retryHandlerOption = new RetryHandlerOption
-            {
-                MaxRetry = RetryCount,
-            };
+            MaxRetry = RetryCount,
+        };
 
-            var groupsResponse = await _graphClient.Groups.GetAsync(requestConfiguration =>
-            {
-                requestConfiguration.QueryParameters.Select = new[] { "id", "displayName", "description", "mailNickname", "createdDateTime" };
-                requestConfiguration.Options.Add(retryHandlerOption);
-            }) ?? throw new ServiceException("GraphClient가 응답하지 않습니다.");
-
-            var pageIterator = GetGroupPageIterator(dbContext, groupsResponse);
-            await pageIterator.IterateAsync();
-            await dbContext.SaveChangesAsync();
-        }
-        catch (Exception ex)
+        var usersResponse = await _graphClient.Users.GetAsync(requestConfiguration =>
         {
-            _logger.LogError(ex, "그룹 데이터를 가져오는 중 에러 발생");
-        }
+            requestConfiguration.QueryParameters.Select = new[] { "id", "displayName", "userPrincipalName", "mailNickname", "createdDateTime" };
+            requestConfiguration.Options.Add(retryHandlerOption);
+        }) ?? throw new ServiceException("GraphClient가 응답하지 않습니다.");
+
+        List<DbUser> userList = new();
+        var pageIterator = GetUserPageIterator(userList, usersResponse);
+        await pageIterator.IterateAsync();
+        await StoreUserToDb(dbContext, userList);
     }
 
-    private PageIterator<GraphGroup, GroupCollectionResponse> GetGroupPageIterator(GraphDbContext dbContext, GroupCollectionResponse groupsResponse)
+    private async Task FetchGroupData(GraphDbContext dbContext)
+    {
+        var retryHandlerOption = new RetryHandlerOption
+        {
+            MaxRetry = RetryCount,
+        };
+
+        var groupsResponse = await _graphClient.Groups.GetAsync(requestConfiguration =>
+        {
+            requestConfiguration.QueryParameters.Select = new[] { "id", "displayName", "description", "mailNickname", "createdDateTime" };
+            requestConfiguration.Options.Add(retryHandlerOption);
+        }) ?? throw new ServiceException("GraphClient가 응답하지 않습니다.");
+
+        List<DbGroup> groupList = new();
+        var pageIterator = GetGroupPageIterator(groupList, groupsResponse);
+        await pageIterator.IterateAsync();
+        await StoreGroupToDb(dbContext, groupList);
+    }
+
+    private PageIterator<GraphGroup, GroupCollectionResponse> GetGroupPageIterator(List<DbGroup> groupList, GroupCollectionResponse groupsResponse)
     {
         return PageIterator<GraphGroup, GroupCollectionResponse>
-            .CreatePageIterator(_graphClient, groupsResponse, async (group) =>
+            .CreatePageIterator(_graphClient, groupsResponse, (group) =>
             {
-                var dbGroup = await dbContext.Groups.FindAsync(group.Id);
-
-                if (dbGroup == null)
+                var dbGroup = new DbGroup
                 {
-                    dbContext.Groups.Add(new DbGroup
-                    {
-                        Id = group.Id!,
-                        DisplayName = group.DisplayName,
-                        Description = group.Description,
-                        MailNickname = group.MailNickname,
-                        CreatedDateTime = group.CreatedDateTime ?? DateTimeOffset.Now
-                    });
+                    Id = group.Id!,
+                    DisplayName = group.DisplayName,
+                    Description = group.Description,
+                    MailNickname = group.MailNickname,
+                    CreatedDateTime = group.CreatedDateTime ?? DateTimeOffset.Now
+                };
+
+                groupList.Add(dbGroup);
+                return Task.FromResult(true);
+            });
+    }
+
+    private async Task StoreGroupToDb(GraphDbContext dbContext, List<DbGroup> groupList)
+    {
+        foreach (var item in groupList)
+        {
+            try
+            {
+                var dbItem = await dbContext.Groups.FindAsync(item.Id);
+
+                if (dbItem == null)
+                {
+                    dbContext.Groups.Add(item);
                 }
                 else
                 {
-                    dbGroup.DisplayName = group.DisplayName;
-                    dbGroup.Description = group.Description;
-                    dbGroup.MailNickname = group.MailNickname;
-                    dbGroup.CreatedDateTime = group.CreatedDateTime ?? DateTimeOffset.Now;
-                    dbContext.Groups.Update(dbGroup);
+                    dbItem.DisplayName = item.DisplayName;
+                    dbItem.Description = item.Description;
+                    dbItem.MailNickname = item.MailNickname;
+                    dbItem.CreatedDateTime = item.CreatedDateTime;
+                    dbContext.Groups.Update(dbItem);
                 }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "DbContext에 아이템 추가 중 에러 발생");
+            }
+        }
+    }
 
+    private PageIterator<GraphUser, UserCollectionResponse> GetUserPageIterator(List<DbUser> userList, UserCollectionResponse usersResponse)
+    {
+        return PageIterator<GraphUser, UserCollectionResponse>
+            .CreatePageIterator(_graphClient, usersResponse, (user) =>
+            {
+                var dbUser = new DbUser
+                {
+                    Id = user.Id!,
+                    DisplayName = user.DisplayName,
+                    UserPrincipalName = user.UserPrincipalName,
+                    MailNickname = user.MailNickname,
+                    CreatedDateTime = user.CreatedDateTime ?? DateTimeOffset.Now
+                };
+
+                userList.Add(dbUser);
                 return true;
             });
     }
 
-    private PageIterator<GraphUser, UserCollectionResponse> GetUserPageIterator(GraphDbContext dbContext, UserCollectionResponse usersResponse)
+    private async Task StoreUserToDb(GraphDbContext dbContext, List<DbUser> userList)
     {
-        return PageIterator<GraphUser, UserCollectionResponse>
-            .CreatePageIterator(_graphClient, usersResponse, async (user) =>
+        foreach (var item in userList)
+        {
+            try
             {
-                var dbUser = await dbContext.Users.FindAsync(user.Id);
+                var dbItem = await dbContext.Users.FindAsync(item.Id);
 
-                if (dbUser == null)
+                if (dbItem == null)
                 {
-                    dbContext.Users.Add(new DbUser
-                    {
-                        Id = user.Id!,
-                        DisplayName = user.DisplayName,
-                        UserPrincipalName = user.UserPrincipalName,
-                        MailNickname = user.MailNickname,
-                        CreatedDateTime = user.CreatedDateTime ?? DateTimeOffset.Now
-                    });
+                    dbContext.Users.Add(item);
                 }
                 else
                 {
-                    dbUser.DisplayName = user.DisplayName;
-                    dbUser.UserPrincipalName = user.UserPrincipalName;
-                    dbUser.MailNickname = user.MailNickname;
-                    dbUser.CreatedDateTime = user.CreatedDateTime ?? DateTimeOffset.Now;
-                    dbContext.Users.Update(dbUser);
+                    dbItem.DisplayName = item.DisplayName;
+                    dbItem.UserPrincipalName = item.UserPrincipalName;
+                    dbItem.MailNickname = item.MailNickname;
+                    dbItem.CreatedDateTime = item.CreatedDateTime;
+                    dbContext.Users.Update(dbItem);
                 }
-
-                return true;
-            });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "DbContext에 아이템 추가 중 에러 발생");
+            }
+        }
     }
 }
