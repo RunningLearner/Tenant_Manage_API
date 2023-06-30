@@ -10,3 +10,7 @@
 // 어플리케이션을 실행합니다.
 dotnet run
 ```
+
+## 특이사항
+
+-   API 키는 appsettings.json의 Secret에서 설정합니다.
