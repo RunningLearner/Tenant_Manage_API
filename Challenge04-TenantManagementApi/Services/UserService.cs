@@ -130,7 +130,7 @@ public sealed class UserService
             throw new KeyNotFoundException($"ID '{id}'를 가진 유저를 찾지 못했습니다.");
         }
 
-        _graphDbContext.Users.Remove(user);
+        user.IsDeleted = true;
         await _graphDbContext.SaveChangesAsync();
         _logger.LogInformation("DeletedUser : {@DeletedUser}", user);
     }

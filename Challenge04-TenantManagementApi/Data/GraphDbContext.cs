@@ -19,9 +19,6 @@ public sealed class GraphDbContext : DbContext
         optionsBuilder
             .UseLoggerFactory(LoggerFactory.Create(builder
                 => builder.AddFilter((category, level) => level == LogLevel.Information)));
-
-        optionsBuilder
-            .AddInterceptors(new SoftDeleteInterceptor());
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

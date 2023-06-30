@@ -124,7 +124,7 @@ public sealed class GroupService
             throw new KeyNotFoundException($"ID '{id}'를 가진 그룹을 찾지 못했습니다.");
         }
 
-        _graphDbContext.Groups.Remove(group);
+        group.IsDeleted = true;
         await _graphDbContext.SaveChangesAsync();
         _logger.LogInformation("DeletedGroup : {@DeletedGroup}", group);
     }

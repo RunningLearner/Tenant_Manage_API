@@ -6,6 +6,8 @@ using GraphUser = Microsoft.Graph.Models.User;
 using DbGroup = Challenge04_TenantManagementApi.Models.Group;
 using GraphGroup = Microsoft.Graph.Models.Group;
 using Microsoft.Kiota.Http.HttpClientLibrary.Middleware.Options;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Graph.Drives.Item.Items.Item.Analytics.ItemActivityStats.Item.Activities.Item;
 
 namespace Challenge04_TenantManagementApi.Services;
 
@@ -102,7 +104,8 @@ public sealed class DataFetchingService
         {
             try
             {
-                var dbItem = await dbContext.Groups.FindAsync(item.Id);
+                var dbItem = await dbContext.Groups.IgnoreQueryFilters()
+                    .SingleOrDefaultAsync(entitiy => entitiy.Id == item.Id);
 
                 if (dbItem == null)
                 {
@@ -149,7 +152,8 @@ public sealed class DataFetchingService
         {
             try
             {
-                var dbItem = await dbContext.Users.FindAsync(item.Id);
+                var dbItem = await dbContext.Users.IgnoreQueryFilters()
+                    .SingleOrDefaultAsync(entitiy => entitiy.Id == item.Id);
 
                 if (dbItem == null)
                 {
