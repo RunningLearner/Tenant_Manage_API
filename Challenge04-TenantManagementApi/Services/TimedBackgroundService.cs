@@ -55,7 +55,7 @@ public sealed class TimedBackgroundService : IHostedService, IDisposable
     public Task StopAsync(CancellationToken cancellationToken)
     {
         _logger.LogInformation("[{ClassName}] 서비스 종료", ClassName);
-        _timer.Close();
+        Dispose();
         return Task.CompletedTask;
     }
 
@@ -64,6 +64,6 @@ public sealed class TimedBackgroundService : IHostedService, IDisposable
     /// </summary>
     public void Dispose()
     {
-        _timer.Dispose();
+        _timer.Close();
     }
 }
