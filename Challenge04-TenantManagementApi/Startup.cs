@@ -166,8 +166,6 @@ public class Startup
 
         app.UseRouting();
 
-        app.UseAuthorization();
-
         app.UseMiddleware<ExceptionHandlingMiddleware>();
 
         app.UseEndpoints(endpoints =>
