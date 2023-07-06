@@ -1120,3 +1120,11 @@ $RECYCLE.BIN/
 # Additional files built by Visual Studio
 
 # End of https://www.toptal.com/developers/gitignore/api/windows,linux,macos,csharp,dotnetcore,aspnetcore,vs,visualstudio,visualstudiocode,jetbrains,rider
+.vscode/settings.json
+Challenge04-TenantManagementApi/Challenge04-TenantManagementApi.sln
+Challenge04-TenantManagementApi/.vscode/settings.json
+Challenge04-TenantManagementApi/.vscode/tasks.json
+Challenge04-TenantManagementApi/.vscode/launch.json
+Challenge04-TenantManagementApi/Properties/launchSettings.json
+Challenge04-TenantManagementApi/graph.db-shm
+Challenge04-TenantManagementApi/graph.db-wal
