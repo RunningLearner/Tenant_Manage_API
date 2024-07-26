@@ -1,15 +1,15 @@
-using Challenge04_TenantManagementApi.Data;
+using TenantManagementApi.Data;
 using Microsoft.Graph;
 using Microsoft.Graph.Models;
-using DbUser = Challenge04_TenantManagementApi.Models.User;
+using DbUser = TenantManagementApi.Models.User;
 using GraphUser = Microsoft.Graph.Models.User;
-using DbGroup = Challenge04_TenantManagementApi.Models.Group;
+using DbGroup = TenantManagementApi.Models.Group;
 using GraphGroup = Microsoft.Graph.Models.Group;
 using Microsoft.Kiota.Http.HttpClientLibrary.Middleware.Options;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Graph.Drives.Item.Items.Item.Analytics.ItemActivityStats.Item.Activities.Item;
 
-namespace Challenge04_TenantManagementApi.Services;
+namespace TenantManagementApi.Services;
 
 public sealed class DataFetchingService
 {

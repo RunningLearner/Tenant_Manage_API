@@ -1,16 +1,16 @@
 using System.Security.Cryptography.X509Certificates;
 using Microsoft.Graph;
 using Azure.Identity;
-using Challenge04_TenantManagementApi.Services;
+using TenantManagementApi.Services;
 using Microsoft.OpenApi.Models;
-using Challenge04_TenantManagementApi.Filters;
-using Challenge04_TenantManagementApi.Middlewares;
-using Challenge04_TenantManagementApi.Data;
+using TenantManagementApi.Filters;
+using TenantManagementApi.Middlewares;
+using TenantManagementApi.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Routing;
 
-namespace Challenge04_TenantManagementApi;
+namespace TenantManagementApi;
 
 public class Startup
 {

@@ -3,7 +3,7 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Graph.Models.ODataErrors;
 
-namespace Challenge04_TenantManagementApi.Middlewares;
+namespace TenantManagementApi.Middlewares;
 
 public class ExceptionHandlingMiddleware : IMiddleware
 {

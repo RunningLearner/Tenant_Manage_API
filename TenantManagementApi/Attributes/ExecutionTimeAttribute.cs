@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace Challenge04_TenantManagementApi.Attributes;
+namespace TenantManagementApi.Attributes;
 
 [AttributeUsage(validOn: AttributeTargets.Method)]
 public class ExecutionTimeAttribute : Attribute, IAsyncActionFilter

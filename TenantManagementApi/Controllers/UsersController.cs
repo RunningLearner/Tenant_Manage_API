@@ -1,12 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http.Extensions;
-using Challenge04_TenantManagementApi.Services;
-using Challenge04_TenantManagementApi.Models;
-using Challenge04_TenantManagementApi.Attributes;
+using TenantManagementApi.Services;
+using TenantManagementApi.Models;
+using TenantManagementApi.Attributes;
 using System.ComponentModel.DataAnnotations;
 using System.Web;
 
-namespace Challenge04_TenantManagementApi.Controllers;
+namespace TenantManagementApi.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]

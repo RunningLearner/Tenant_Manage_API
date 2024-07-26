@@ -1,4 +1,4 @@
-namespace Challenge04_TenantManagementApi.Models;
+namespace TenantManagementApi.Models;
 
 public interface ISoftDelete
 {

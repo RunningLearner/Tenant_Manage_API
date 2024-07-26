@@ -2,7 +2,7 @@ using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace Challenge04_TenantManagementApi.Attributes;
+namespace TenantManagementApi.Attributes;
 
 [AttributeUsage(validOn: AttributeTargets.Class | AttributeTargets.Method)]
 public class ApiKeyAuthAttribute : Attribute, IAsyncActionFilter

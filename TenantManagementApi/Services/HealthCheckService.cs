@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 
-namespace Challenge04_TenantManagementApi.Services;
+namespace TenantManagementApi.Services;
 
 public class HealthCheckService : IHealthCheck
 {

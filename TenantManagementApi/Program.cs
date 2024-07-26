@@ -1,6 +1,6 @@
 using Serilog;
 
-namespace Challenge04_TenantManagementApi;
+namespace TenantManagementApi;
 
 public static class Program
 {

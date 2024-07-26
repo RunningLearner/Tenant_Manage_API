@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace Challenge04_TenantManagementApi.Migrations
+namespace TenantManagementApi.Migrations
 {
     /// <inheritdoc />
     public partial class InitialCreate : Migration

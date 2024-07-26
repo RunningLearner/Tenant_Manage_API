@@ -1,12 +1,12 @@
-using Challenge04_TenantManagementApi.Data;
-using Challenge04_TenantManagementApi.Models;
+using TenantManagementApi.Data;
+using TenantManagementApi.Models;
 using Microsoft.Graph;
 using Microsoft.Graph.Models;
 using GraphUser = Microsoft.Graph.Models.User;
-using DbUser = Challenge04_TenantManagementApi.Models.User;
+using DbUser = TenantManagementApi.Models.User;
 using Microsoft.EntityFrameworkCore;
 
-namespace Challenge04_TenantManagementApi.Services;
+namespace TenantManagementApi.Services;
 
 public sealed class UserService
 {

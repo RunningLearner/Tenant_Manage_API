@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
 
-namespace Challenge04_TenantManagementApi.Models;
+namespace TenantManagementApi.Models;
 
 public record UserDto
 {

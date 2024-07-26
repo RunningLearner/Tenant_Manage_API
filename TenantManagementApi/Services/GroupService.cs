@@ -1,11 +1,11 @@
-using Challenge04_TenantManagementApi.Models;
+using TenantManagementApi.Models;
 using Microsoft.Graph;
 using GraphGroup = Microsoft.Graph.Models.Group;
-using DbGroup = Challenge04_TenantManagementApi.Models.Group;
-using Challenge04_TenantManagementApi.Data;
+using DbGroup = TenantManagementApi.Models.Group;
+using TenantManagementApi.Data;
 using Microsoft.EntityFrameworkCore;
 
-namespace Challenge04_TenantManagementApi.Services;
+namespace TenantManagementApi.Services;
 
 public sealed class GroupService
 {

@@ -1,7 +1,7 @@
-using Challenge04_TenantManagementApi.Data;
+using TenantManagementApi.Data;
 using Timer = System.Timers.Timer;
 
-namespace Challenge04_TenantManagementApi.Services;
+namespace TenantManagementApi.Services;
 
 public sealed class TimedBackgroundService : IHostedService, IDisposable
 {

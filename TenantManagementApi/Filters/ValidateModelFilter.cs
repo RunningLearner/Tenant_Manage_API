@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace Challenge04_TenantManagementApi.Filters;
+namespace TenantManagementApi.Filters;
 
 public class ValidateModelFilter : IAsyncActionFilter
 {

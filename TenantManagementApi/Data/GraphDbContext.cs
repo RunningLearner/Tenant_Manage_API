@@ -1,7 +1,7 @@
-using Challenge04_TenantManagementApi.Models;
+using TenantManagementApi.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace Challenge04_TenantManagementApi.Data;
+namespace TenantManagementApi.Data;
 
 public sealed class GraphDbContext : DbContext
 {
